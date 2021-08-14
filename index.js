@@ -16,7 +16,7 @@ const schema = {
  * Main class that select what script to run
  *
  * Note that it is adjusted to using Promise rather than try catch because
- * `finally` somehow activated before promise ended
+ * `finally` somehow activated before promise ended when using try-catch-finally
  *
  * @return {Promise<void>}
  */
