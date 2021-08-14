@@ -3,6 +3,7 @@ const settings = require("../../../settings");
 
 /**
  * DataSet - an instrument timeframe paired set of data
+ * @constructor DataSet
  */
 const DataSetSchema = new mongoose.Schema(
   {
@@ -38,6 +39,7 @@ DataSetSchema.index(
   { unique: true, require: true }
 );
 
+/** @type {Model<DataSet>} */
 const DataSet = mongoose.model("DataSet", DataSetSchema, "DataSet");
 
 module.exports = DataSet;

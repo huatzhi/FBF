@@ -8,18 +8,30 @@ const mongoose = require("mongoose");
 
 const dbName = "bfb";
 
-mongoose.connect(`mongodb://localhost:27017/${dbName}`, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-});
-
 /**
- * Close db connection.
- * Allow script to actually stop after everything finished.
+ * handle database startup and closing
  */
-function closeDb() {
-  mongoose.connection.close();
+class Loader {
+  /**
+   * Initiate connection to db
+   * @return {Promise<void>}
+   */
+  static async connectDb() {
+    await mongoose.connect(`mongodb://localhost:27017/${dbName}`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    });
+  }
+
+  /**
+   * Close db connection.
+   * Allow script to actually stop after everything finished.
+   * @return {Promise<void>}
+   */
+  static async closeDb() {
+    await mongoose.connection.close();
+  }
 }
 
-module.exports.closeDb = closeDb;
+module.exports = Loader;

@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 const settings = require("../../../settings");
 
 /**
- * Bar
+ * Every single bar details
+ * @constructor Bar
  */
 const BarSchema = new mongoose.Schema(
   {
@@ -54,6 +55,7 @@ BarSchema.index(
 );
 BarSchema.index({ disqualified: 1, instrument: 1, timeFrame: 1, datetime: 1 });
 
+/** @type {Model<Bar>} */
 const Bar = mongoose.model("Bar", BarSchema, "Bar");
 
 module.exports = Bar;
