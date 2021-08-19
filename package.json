@@ -14,7 +14,8 @@
     "async": "^3.2.1",
     "fast-csv": "^4.3.6",
     "mongoose": "^5.13.5",
-    "prompt": "^1.1.0"
+    "prompt": "^1.1.0",
+    "technicalindicators": "^3.1.0"
   },
   "devDependencies": {
     "eslint": "^7.32.0",

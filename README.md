@@ -9,3 +9,6 @@ npm i
 ```shell
 npm start
 ```
+
+## Notes
+* Anything that require volume will be discarded

@@ -45,6 +45,14 @@ async function main() {
      * csv have to follow DF structure.
      * Then, run the script, it will save the raw data into db.
      *
+     * 2 - Fill indicator values to Bar
+     * Detect available indicators, update them into bars. Options allow to choose to
+     * either run all or specific DataSet/Indicators.
+     *
+     * 2.1 - Add new indicator
+     * Just add a new indicator config in `./scripts/2.1/options/newIndicators.js` and
+     * run the script.
+     *
      */
 
     res();
