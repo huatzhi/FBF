@@ -53,6 +53,11 @@ async function main() {
      * Just add a new indicator config in `./scripts/2.1/options/newIndicators.js` and
      * run the script.
      *
+     * 3 - Fill result values to Bar
+     * Result format can refer to `./shared/const/result.js`
+     *
+     * 3.1 - Add new result format
+     *
      */
 
     res();

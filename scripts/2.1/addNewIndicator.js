@@ -17,6 +17,7 @@ async function addNewIndicators() {
  * @return {Promise<void>}
  */
 async function addNewIndicator(newIndicator) {
+  newIndicator.key = newIndicator.key.replace(".", "_");
   const existed = await Indicator.findOne({ key: newIndicator.key }).lean();
 
   if (existed) {

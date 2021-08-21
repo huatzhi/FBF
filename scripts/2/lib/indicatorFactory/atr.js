@@ -141,3 +141,5 @@ class AtrFactory {
 }
 
 module.exports = AtrFactory;
+
+// todo :: use sma ATR instead

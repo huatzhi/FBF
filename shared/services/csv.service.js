@@ -15,6 +15,14 @@ async function getDataFromCsv(path) {
       .on("error", (error) => rej(error)) // just prompt error if there is any
       .on("data", ({ datetime, open, high, low, close }) => {
         // store the data to an array
+        datetime = new Date(datetime);
+
+        // +5 is hacky fix because it detect with local time (which is +8),
+        // yet the time input suppose to be +3 (market candle start)
+        // so it is + 8 - 3
+        // it will break if it is use outside of gmt+8 timezone
+        datetime.setHours(datetime.getHours() + 5);
+
         data.push({
           datetime: new Date(datetime),
           open: Number(open),

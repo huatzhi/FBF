@@ -8,12 +8,12 @@ const { ResultTypes } = require("../../const/result");
 const ResultSchema = new mongoose.Schema(
   {
     // Result key, e.g. 'ATR(10)'.
-    key: { type: String, index: true },
+    key: { type: String, index: true, unique: true, required: true },
 
     // Result type
     type: { type: String, enum: Object.values(ResultTypes), index: true },
 
-    // attributes and values, e.g. {atrPeriod: 14, sl: 1.5, tp: 4}
+    // attributes and values, e.g. {atrPeriod: 14, sl: 1.2, tp: 3.5, tradeLength: 10}
     att: { type: JSON, default: {} },
   },
   {

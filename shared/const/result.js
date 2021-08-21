@@ -13,6 +13,14 @@ const ResultTypes = {
   // FIXED: 'fixed',  // not implemented
 };
 
+const Result = {
+  NONE: [0, 0, 1],
+  LONG: [1, 0, 0],
+  SHORT: [0, 1, 0],
+  BOTH: [1, 1, 0],
+};
+
 module.exports = {
+  Result,
   ResultTypes,
 };

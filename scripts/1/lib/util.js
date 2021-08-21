@@ -8,7 +8,8 @@ function getInstrumentNameFromPath(path) {
   const substr1 = fileName.split("-")[0];
   const substrArr = substr1.split(".");
   const substr2 = substrArr[substrArr.length - 1];
-  return substr2.replace(/[^a-zA-Z]+/g, "");
+  const substr3 = substr2.split("_")[0];
+  return substr3.replace(/[^a-zA-Z]+/g, "");
 }
 
 /**

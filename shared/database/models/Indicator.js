@@ -8,7 +8,7 @@ const { IndicatorTypes } = require("../../const/indicators");
 const IndicatorSchema = new mongoose.Schema(
   {
     // Indicator key, e.g. 'ATR(10)'.
-    key: { type: String, index: true, unique: true },
+    key: { type: String, index: true, unique: true, required: true },
 
     // Indicator type
     type: { type: String, enum: Object.values(IndicatorTypes), index: true },
