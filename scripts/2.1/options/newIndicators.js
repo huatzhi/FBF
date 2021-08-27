@@ -9,9 +9,10 @@ const newIndicators = [
       period: 14,
     },
   },
+  // ADX
   {
     key: "ADX(14)",
-    type: IndicatorTypes.ATR,
+    type: IndicatorTypes.CUSTOM,
     name: "adx",
     att: {
       period: 14,
@@ -19,7 +20,7 @@ const newIndicators = [
   },
   {
     key: "ADX(7)",
-    type: IndicatorTypes.ATR,
+    type: IndicatorTypes.CUSTOM,
     name: "adx",
     att: {
       period: 7,
@@ -27,10 +28,38 @@ const newIndicators = [
   },
   {
     key: "ADX(30)",
-    type: IndicatorTypes.ATR,
+    type: IndicatorTypes.CUSTOM,
     name: "adx",
     att: {
       period: 30,
+    },
+  },
+  // Awesome Oscillator
+  {
+    key: "AO(5,34)",
+    type: IndicatorTypes.CUSTOM,
+    name: "ao",
+    att: {
+      fastPeriod: 5,
+      slowPeriod: 34,
+    },
+  },
+  {
+    key: "AO(7,24)",
+    type: IndicatorTypes.CUSTOM,
+    name: "ao",
+    att: {
+      fastPeriod: 7,
+      slowPeriod: 24,
+    },
+  },
+  {
+    key: "AO(10,36)",
+    type: IndicatorTypes.CUSTOM,
+    name: "ao",
+    att: {
+      fastPeriod: 10,
+      slowPeriod: 36,
     },
   },
 ];
