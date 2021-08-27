@@ -62,6 +62,72 @@ const newIndicators = [
       slowPeriod: 36,
     },
   },
+  // Bollinger Bands
+  {
+    key: "BB(10,1_5)",
+    type: IndicatorTypes.PRICE,
+    name: "bb",
+    att: {
+      period: 10,
+      stdDev: 1.5,
+    },
+  },
+  {
+    key: "BB(12,1)",
+    type: IndicatorTypes.PRICE,
+    name: "bb",
+    att: {
+      period: 12,
+      stdDev: 1,
+    },
+  },
+  {
+    key: "BB(12,2)",
+    type: IndicatorTypes.PRICE,
+    name: "bb",
+    att: {
+      period: 12,
+      stdDev: 2,
+      ignoreMiddle: true,
+    },
+  },
+  {
+    key: "BB(14,1)",
+    type: IndicatorTypes.PRICE,
+    name: "bb",
+    att: {
+      period: 14,
+      stdDev: 1,
+    },
+  },
+  {
+    key: "BB(14,2)",
+    type: IndicatorTypes.PRICE,
+    name: "bb",
+    att: {
+      period: 14,
+      stdDev: 2,
+      ignoreMiddle: true,
+    },
+  },
+  {
+    key: "BB(20,2)",
+    type: IndicatorTypes.PRICE,
+    name: "bb",
+    att: {
+      period: 20,
+      stdDev: 2,
+    },
+  },
+  {
+    key: "BB(50,2_5)",
+    type: IndicatorTypes.PRICE,
+    name: "bb",
+    att: {
+      period: 50,
+      stdDev: 2_5,
+    },
+  },
 ];
 
 module.exports = newIndicators;
