@@ -9,6 +9,30 @@ const newIndicators = [
       period: 14,
     },
   },
+  {
+    key: "ADX(14)",
+    type: IndicatorTypes.ATR,
+    name: "adx",
+    att: {
+      period: 14,
+    },
+  },
+  {
+    key: "ADX(7)",
+    type: IndicatorTypes.ATR,
+    name: "adx",
+    att: {
+      period: 7,
+    },
+  },
+  {
+    key: "ADX(30)",
+    type: IndicatorTypes.ATR,
+    name: "adx",
+    att: {
+      period: 30,
+    },
+  },
 ];
 
 module.exports = newIndicators;
