@@ -141,5 +141,3 @@ class AdxFactory {
 }
 
 module.exports = AdxFactory;
-
-// use sma ADX instead soon
