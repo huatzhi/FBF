@@ -7,6 +7,7 @@ const IndicatorFactory = {
   kst: require("./kst"),
   macd: require("./macd"),
   roc: require("./roc"),
+  rsi: require("./rsi"),
 };
 
 module.exports = IndicatorFactory;

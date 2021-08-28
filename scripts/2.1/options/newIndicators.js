@@ -332,6 +332,63 @@ const newIndicators = [
       period: 200,
     },
   },
+  // Relative Strength Index (RSI)
+  {
+    key: "RSI(5)",
+    type: IndicatorTypes.CUSTOM,
+    name: "rsi",
+    att: {
+      period: 5,
+    },
+  },
+  {
+    key: "RSI(9)",
+    type: IndicatorTypes.CUSTOM,
+    name: "rsi",
+    att: {
+      period: 9,
+    },
+  },
+  {
+    key: "RSI(14)",
+    type: IndicatorTypes.CUSTOM,
+    name: "rsi",
+    att: {
+      period: 14,
+    },
+  },
+  {
+    key: "RSI(20)",
+    type: IndicatorTypes.CUSTOM,
+    name: "rsi",
+    att: {
+      period: 20,
+    },
+  },
+  {
+    key: "RSI(50)",
+    type: IndicatorTypes.CUSTOM,
+    name: "rsi",
+    att: {
+      period: 50,
+    },
+  },
+  {
+    key: "RSI(100)",
+    type: IndicatorTypes.CUSTOM,
+    name: "rsi",
+    att: {
+      period: 100,
+    },
+  },
+  {
+    key: "RSI(200)",
+    type: IndicatorTypes.CUSTOM,
+    name: "rsi",
+    att: {
+      period: 200,
+    },
+  },
 ];
 
 module.exports = newIndicators;
