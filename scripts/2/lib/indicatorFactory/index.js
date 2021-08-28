@@ -4,6 +4,7 @@ const IndicatorFactory = {
   ao: require("./ao"),
   bb: require("./bb"),
   cci: require("./cci"),
+  kst: require("./kst"),
 };
 
 module.exports = IndicatorFactory;

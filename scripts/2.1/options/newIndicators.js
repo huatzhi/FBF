@@ -185,6 +185,23 @@ const newIndicators = [
       period: 200,
     },
   },
+  // kst
+  {
+    key: "KST(default)",
+    type: IndicatorTypes.CUSTOM,
+    name: "kst",
+    att: {
+      ROCPer1: 10,
+      ROCPer2: 15,
+      ROCPer3: 20,
+      ROCPer4: 30,
+      SMAROCPer1: 10,
+      SMAROCPer2: 10,
+      SMAROCPer3: 10,
+      SMAROCPer4: 15,
+      signalPeriod: 9,
+    },
+  },
 ];
 
 module.exports = newIndicators;
