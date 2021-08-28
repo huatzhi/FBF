@@ -10,6 +10,7 @@ const IndicatorFactory = {
   rsi: require("./rsi"),
   sma: require("./sma"),
   kd: require("./kd"),
+  trix: require("./trix"),
 };
 
 module.exports = IndicatorFactory;

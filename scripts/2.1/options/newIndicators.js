@@ -491,6 +491,55 @@ const newIndicators = [
       signalPeriod: 20,
     },
   },
+  // TRIX
+  {
+    key: "TRIX(5)",
+    type: IndicatorTypes.CUSTOM,
+    name: "trix",
+    att: {
+      period: 5,
+    },
+  },
+  {
+    key: "TRIX(9)",
+    type: IndicatorTypes.CUSTOM,
+    name: "trix",
+    att: {
+      period: 9,
+    },
+  },
+  {
+    key: "TRIX(14)",
+    type: IndicatorTypes.CUSTOM,
+    name: "trix",
+    att: {
+      period: 14,
+    },
+  },
+  {
+    key: "TRIX(20)",
+    type: IndicatorTypes.CUSTOM,
+    name: "trix",
+    att: {
+      period: 20,
+    },
+  },
+  {
+    key: "TRIX(50)",
+    type: IndicatorTypes.CUSTOM,
+    name: "trix",
+    att: {
+      period: 50,
+    },
+  },
+  {
+    key: "TRIX(72)",
+    type: IndicatorTypes.CUSTOM,
+    name: "trix",
+    att: {
+      period: 72,
+    },
+  },
 ];
 
 module.exports = newIndicators;
