@@ -735,6 +735,71 @@ const newIndicators = [
       period: 200,
     },
   },
+  // WilliamsR
+  {
+    key: "WR(5)",
+    type: IndicatorTypes.CUSTOM,
+    name: "wr",
+    att: {
+      period: 5,
+    },
+  },
+  {
+    key: "WR(9)",
+    type: IndicatorTypes.CUSTOM,
+    name: "wr",
+    att: {
+      period: 9,
+    },
+  },
+  {
+    key: "WR(14)",
+    type: IndicatorTypes.CUSTOM,
+    name: "wr",
+    att: {
+      period: 14,
+    },
+  },
+  {
+    key: "WR(20)",
+    type: IndicatorTypes.CUSTOM,
+    name: "wr",
+    att: {
+      period: 20,
+    },
+  },
+  {
+    key: "WR(50)",
+    type: IndicatorTypes.CUSTOM,
+    name: "wr",
+    att: {
+      period: 50,
+    },
+  },
+  {
+    key: "WR(72)",
+    type: IndicatorTypes.CUSTOM,
+    name: "wr",
+    att: {
+      period: 72,
+    },
+  },
+  {
+    key: "WR(100)",
+    type: IndicatorTypes.CUSTOM,
+    name: "wr",
+    att: {
+      period: 100,
+    },
+  },
+  {
+    key: "WR(200)",
+    type: IndicatorTypes.CUSTOM,
+    name: "wr",
+    att: {
+      period: 200,
+    },
+  },
 ];
 
 module.exports = newIndicators;
