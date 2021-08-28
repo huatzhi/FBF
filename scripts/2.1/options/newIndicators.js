@@ -202,6 +202,79 @@ const newIndicators = [
       signalPeriod: 9,
     },
   },
+  // macd
+  {
+    key: "MACD(5,8,3,f,f)",
+    type: IndicatorTypes.CUSTOM,
+    name: "macd",
+    att: {
+      fastPeriod: 5,
+      slowPeriod: 8,
+      signalPeriod: 3,
+      SimpleMAOscillator: false,
+      SimpleMASignal: false,
+    },
+  },
+  {
+    key: "MACD(5,8,3,t,t)",
+    type: IndicatorTypes.CUSTOM,
+    name: "macd",
+    att: {
+      fastPeriod: 5,
+      slowPeriod: 8,
+      signalPeriod: 3,
+      SimpleMAOscillator: true,
+      SimpleMASignal: true,
+    },
+  },
+  {
+    key: "MACD(12,26,9,f,f)",
+    type: IndicatorTypes.CUSTOM,
+    name: "macd",
+    att: {
+      fastPeriod: 12,
+      slowPeriod: 26,
+      signalPeriod: 9,
+      SimpleMAOscillator: false,
+      SimpleMASignal: false,
+    },
+  },
+  {
+    key: "MACD(12,26,9,t,t)",
+    type: IndicatorTypes.CUSTOM,
+    name: "macd",
+    att: {
+      fastPeriod: 12,
+      slowPeriod: 26,
+      signalPeriod: 9,
+      SimpleMAOscillator: true,
+      SimpleMASignal: true,
+    },
+  },
+  {
+    key: "MACD(19,39,9,f,f)",
+    type: IndicatorTypes.CUSTOM,
+    name: "macd",
+    att: {
+      fastPeriod: 19,
+      slowPeriod: 39,
+      signalPeriod: 9,
+      SimpleMAOscillator: false,
+      SimpleMASignal: false,
+    },
+  },
+  {
+    key: "MACD(19,39,9,t,t)",
+    type: IndicatorTypes.CUSTOM,
+    name: "macd",
+    att: {
+      fastPeriod: 19,
+      slowPeriod: 39,
+      signalPeriod: 9,
+      SimpleMAOscillator: true,
+      SimpleMASignal: true,
+    },
+  },
 ];
 
 module.exports = newIndicators;

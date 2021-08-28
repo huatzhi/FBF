@@ -1,12 +1,12 @@
-const CCI = require("technicalindicators").CCI;
+const MACD = require("technicalindicators").MACD;
 const { Bar, DataSet } = require("../../../../shared/database/models/index");
 
 /**
- * Functions that fill up CCI values
+ * Functions that fill up MACD values
  */
-class CciFactory {
+class MacdFactory {
   /**
-   * Setup a factory that fill up CCI values of certain dataSet
+   * Setup a factory that fill up MACD values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,7 +22,11 @@ class CciFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.period = att.period ?? 20;
+    this.fastPeriod = att.fastPeriod ?? 12;
+    this.slowPeriod = att.slowPeriod ?? 26;
+    this.signalPeriod = att.signalPeriod ?? 9;
+    this.SimpleMAOscillator = att.SimpleMAOscillator ?? false;
+    this.SimpleMASignal = att.SimpleMASignal ?? false;
 
     this.initialized = false;
   }
@@ -35,12 +39,13 @@ class CciFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.cci = new CCI({
-        period: this.period,
-        open: [],
-        high: [],
-        low: [],
-        close: [],
+      this.macd = new MACD({
+        values: [],
+        fastPeriod: this.fastPeriod,
+        slowPeriod: this.slowPeriod,
+        signalPeriod: this.signalPeriod,
+        SimpleMAOscillator: this.SimpleMAOscillator,
+        SimpleMASignal: this.SimpleMASignal,
       });
       return;
     }
@@ -49,6 +54,8 @@ class CciFactory {
       this.completed = true;
       return;
     }
+
+    const barRequired = this.slowPeriod + this.signalPeriod;
 
     const pastProcessedCandleInPeriod = await Bar.find(
       {
@@ -59,15 +66,19 @@ class CciFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(this.period)
+      .limit(barRequired)
       .lean();
 
-    const open = pastProcessedCandleInPeriod.map((b) => b.open).reverse();
-    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
-    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
-    const close = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
+    const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.cci = new CCI({ period: this.period, open, high, low, close });
+    this.macd = new MACD({
+      values,
+      fastPeriod: this.fastPeriod,
+      slowPeriod: this.slowPeriod,
+      signalPeriod: this.signalPeriod,
+      SimpleMAOscillator: this.SimpleMAOscillator,
+      SimpleMASignal: this.SimpleMASignal,
+    });
   }
 
   /**
@@ -87,7 +98,6 @@ class CciFactory {
       barQuery.datetime = { $gt: this.lastProcessedCandle };
     }
     const bars = await Bar.find(barQuery, {
-      open: 1,
       high: 1,
       low: 1,
       close: 1,
@@ -103,12 +113,7 @@ class CciFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.cci.nextValue({
-        open: bar.open,
-        high: bar.high,
-        low: bar.low,
-        close: bar.close,
-      });
+      const result = this.macd.nextValue(bar.close);
 
       const output = {
         updateOne: {
@@ -151,4 +156,4 @@ class CciFactory {
   }
 }
 
-module.exports = CciFactory;
+module.exports = MacdFactory;
