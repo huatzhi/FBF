@@ -8,6 +8,7 @@ const IndicatorFactory = {
   macd: require("./macd"),
   roc: require("./roc"),
   rsi: require("./rsi"),
+  sma: require("./sma"),
 };
 
 module.exports = IndicatorFactory;

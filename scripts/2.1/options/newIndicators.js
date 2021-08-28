@@ -389,6 +389,71 @@ const newIndicators = [
       period: 200,
     },
   },
+  // SMA
+  {
+    key: "SMA(5)",
+    type: IndicatorTypes.PRICE,
+    name: "sma",
+    att: {
+      period: 5,
+    },
+  },
+  {
+    key: "SMA(9)",
+    type: IndicatorTypes.PRICE,
+    name: "sma",
+    att: {
+      period: 9,
+    },
+  },
+  {
+    key: "SMA(14)",
+    type: IndicatorTypes.PRICE,
+    name: "sma",
+    att: {
+      period: 14,
+    },
+  },
+  {
+    key: "SMA(20)",
+    type: IndicatorTypes.PRICE,
+    name: "sma",
+    att: {
+      period: 20,
+    },
+  },
+  {
+    key: "SMA(50)",
+    type: IndicatorTypes.PRICE,
+    name: "sma",
+    att: {
+      period: 50,
+    },
+  },
+  {
+    key: "SMA(72)",
+    type: IndicatorTypes.PRICE,
+    name: "sma",
+    att: {
+      period: 72,
+    },
+  },
+  {
+    key: "SMA(100)",
+    type: IndicatorTypes.PRICE,
+    name: "sma",
+    att: {
+      period: 100,
+    },
+  },
+  {
+    key: "SMA(200)",
+    type: IndicatorTypes.PRICE,
+    name: "sma",
+    att: {
+      period: 200,
+    },
+  },
 ];
 
 module.exports = newIndicators;
