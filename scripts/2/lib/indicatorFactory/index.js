@@ -9,6 +9,7 @@ const IndicatorFactory = {
   roc: require("./roc"),
   rsi: require("./rsi"),
   sma: require("./sma"),
+  kd: require("./kd"),
 };
 
 module.exports = IndicatorFactory;

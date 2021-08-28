@@ -454,6 +454,43 @@ const newIndicators = [
       period: 200,
     },
   },
+  // Stochastic Oscillator
+  {
+    key: "KD(5,3)",
+    type: IndicatorTypes.CUSTOM,
+    name: "kd",
+    att: {
+      period: 5,
+      signalPeriod: 3,
+    },
+  },
+  {
+    key: "KD(14,3)",
+    type: IndicatorTypes.CUSTOM,
+    name: "kd",
+    att: {
+      period: 14,
+      signalPeriod: 3,
+    },
+  },
+  {
+    key: "KD(21,14)",
+    type: IndicatorTypes.CUSTOM,
+    name: "kd",
+    att: {
+      period: 21,
+      signalPeriod: 14,
+    },
+  },
+  {
+    key: "KD(72,20)",
+    type: IndicatorTypes.CUSTOM,
+    name: "kd",
+    att: {
+      period: 72,
+      signalPeriod: 20,
+    },
+  },
 ];
 
 module.exports = newIndicators;

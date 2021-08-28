@@ -1,12 +1,12 @@
-const ADX = require("technicalindicators").ADX;
+const KD = require("technicalindicators").Stochastic;
 const { Bar, DataSet } = require("../../../../shared/database/models/index");
 
 /**
- * Functions that fill up ADX values
+ * Functions that fill up Stochastic Oscillator values
  */
-class AdxFactory {
+class StochasticFactory {
   /**
-   * Setup a factory that fill up ADX values of certain dataSet
+   * Setup a factory that fill up Stochastic Oscillator values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -23,6 +23,7 @@ class AdxFactory {
     this.key = key;
 
     this.period = att.period ?? 14;
+    this.signalPeriod = att.signalPeriod ?? 3;
 
     this.initialized = false;
   }
@@ -35,7 +36,13 @@ class AdxFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.adx = new ADX({ period: this.period, high: [], low: [], close: [] });
+      this.kd = new KD({
+        period: this.period,
+        signalPeriod: this.signalPeriod,
+        high: [],
+        low: [],
+        close: [],
+      });
       return;
     }
 
@@ -43,6 +50,8 @@ class AdxFactory {
       this.completed = true;
       return;
     }
+
+    const requiredBars = this.period + this.signalPeriod;
 
     const pastProcessedCandleInPeriod = await Bar.find(
       {
@@ -53,14 +62,20 @@ class AdxFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(this.period)
+      .limit(requiredBars)
       .lean();
 
     const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
     const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
     const close = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.adx = new ADX({ period: this.period, high, low, close });
+    this.kd = new KD({
+      period: this.period,
+      signalPeriod: this.signalPeriod,
+      high,
+      low,
+      close,
+    });
   }
 
   /**
@@ -95,7 +110,9 @@ class AdxFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.adx.nextValue({
+      const result = this.kd.nextValue({
+        period: this.period,
+        signalPeriod: this.signalPeriod,
         high: bar.high,
         low: bar.low,
         close: bar.close,
@@ -142,4 +159,4 @@ class AdxFactory {
   }
 }
 
-module.exports = AdxFactory;
+module.exports = StochasticFactory;
