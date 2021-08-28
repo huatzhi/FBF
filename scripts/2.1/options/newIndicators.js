@@ -540,6 +540,201 @@ const newIndicators = [
       period: 72,
     },
   },
+  // EMA
+  {
+    key: "EMA(5)",
+    type: IndicatorTypes.PRICE,
+    name: "ema",
+    att: {
+      period: 5,
+    },
+  },
+  {
+    key: "EMA(9)",
+    type: IndicatorTypes.PRICE,
+    name: "ema",
+    att: {
+      period: 9,
+    },
+  },
+  {
+    key: "EMA(14)",
+    type: IndicatorTypes.PRICE,
+    name: "ema",
+    att: {
+      period: 14,
+    },
+  },
+  {
+    key: "EMA(20)",
+    type: IndicatorTypes.PRICE,
+    name: "ema",
+    att: {
+      period: 20,
+    },
+  },
+  {
+    key: "EMA(50)",
+    type: IndicatorTypes.PRICE,
+    name: "ema",
+    att: {
+      period: 50,
+    },
+  },
+  {
+    key: "EMA(72)",
+    type: IndicatorTypes.PRICE,
+    name: "ema",
+    att: {
+      period: 72,
+    },
+  },
+  {
+    key: "EMA(100)",
+    type: IndicatorTypes.PRICE,
+    name: "ema",
+    att: {
+      period: 100,
+    },
+  },
+  {
+    key: "EMA(200)",
+    type: IndicatorTypes.PRICE,
+    name: "ema",
+    att: {
+      period: 200,
+    },
+  },
+  // WMA
+  {
+    key: "WMA(5)",
+    type: IndicatorTypes.PRICE,
+    name: "wma",
+    att: {
+      period: 5,
+    },
+  },
+  {
+    key: "WMA(9)",
+    type: IndicatorTypes.PRICE,
+    name: "wma",
+    att: {
+      period: 9,
+    },
+  },
+  {
+    key: "WMA(14)",
+    type: IndicatorTypes.PRICE,
+    name: "wma",
+    att: {
+      period: 14,
+    },
+  },
+  {
+    key: "WMA(20)",
+    type: IndicatorTypes.PRICE,
+    name: "wma",
+    att: {
+      period: 20,
+    },
+  },
+  {
+    key: "WMA(50)",
+    type: IndicatorTypes.PRICE,
+    name: "wma",
+    att: {
+      period: 50,
+    },
+  },
+  {
+    key: "WMA(72)",
+    type: IndicatorTypes.PRICE,
+    name: "wma",
+    att: {
+      period: 72,
+    },
+  },
+  {
+    key: "WMA(100)",
+    type: IndicatorTypes.PRICE,
+    name: "wma",
+    att: {
+      period: 100,
+    },
+  },
+  {
+    key: "WMA(200)",
+    type: IndicatorTypes.PRICE,
+    name: "wma",
+    att: {
+      period: 200,
+    },
+  },
+  // WEMA
+  {
+    key: "WEMA(5)",
+    type: IndicatorTypes.PRICE,
+    name: "wema",
+    att: {
+      period: 5,
+    },
+  },
+  {
+    key: "WEMA(9)",
+    type: IndicatorTypes.PRICE,
+    name: "wema",
+    att: {
+      period: 9,
+    },
+  },
+  {
+    key: "WEMA(14)",
+    type: IndicatorTypes.PRICE,
+    name: "wema",
+    att: {
+      period: 14,
+    },
+  },
+  {
+    key: "WEMA(20)",
+    type: IndicatorTypes.PRICE,
+    name: "wema",
+    att: {
+      period: 20,
+    },
+  },
+  {
+    key: "WEMA(50)",
+    type: IndicatorTypes.PRICE,
+    name: "wema",
+    att: {
+      period: 50,
+    },
+  },
+  {
+    key: "WEMA(72)",
+    type: IndicatorTypes.PRICE,
+    name: "wema",
+    att: {
+      period: 72,
+    },
+  },
+  {
+    key: "WEMA(100)",
+    type: IndicatorTypes.PRICE,
+    name: "wema",
+    att: {
+      period: 100,
+    },
+  },
+  {
+    key: "WEMA(200)",
+    type: IndicatorTypes.PRICE,
+    name: "wema",
+    att: {
+      period: 200,
+    },
+  },
 ];
 
 module.exports = newIndicators;

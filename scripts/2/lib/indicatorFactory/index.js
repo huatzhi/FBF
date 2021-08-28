@@ -11,6 +11,9 @@ const IndicatorFactory = {
   sma: require("./sma"),
   kd: require("./kd"),
   trix: require("./trix"),
+  ema: require("./ema"),
+  wma: require("./wma"),
+  wema: require("./wema"),
 };
 
 module.exports = IndicatorFactory;
