@@ -128,10 +128,10 @@ class CandleStickFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      this.appendMaxFive(this.pastFiveOpen, bar.open);
-      this.appendMaxFive(this.pastFiveHigh, bar.high);
-      this.appendMaxFive(this.pastFiveLow, bar.low);
-      this.appendMaxFive(this.pastFiveClose, bar.close);
+      CandleStickFactory.appendMaxFive(this.pastFiveOpen, bar.open);
+      CandleStickFactory.appendMaxFive(this.pastFiveHigh, bar.high);
+      CandleStickFactory.appendMaxFive(this.pastFiveLow, bar.low);
+      CandleStickFactory.appendMaxFive(this.pastFiveClose, bar.close);
 
       const result = this.hasPattern();
 
