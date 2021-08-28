@@ -88,7 +88,7 @@ class CandleStickFactory {
    * @param {any} value
    * @return {void}
    */
-  appendMaxFive(arr, value) {
+  static appendMaxFive(arr, value) {
     arr.push(value);
     if (arr.length > 5) {
       arr.shift();
