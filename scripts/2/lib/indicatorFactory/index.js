@@ -6,6 +6,7 @@ const IndicatorFactory = {
   cci: require("./cci"),
   kst: require("./kst"),
   macd: require("./macd"),
+  roc: require("./roc"),
 };
 
 module.exports = IndicatorFactory;

@@ -275,6 +275,63 @@ const newIndicators = [
       SimpleMASignal: true,
     },
   },
+  // rate of change
+  {
+    key: "ROC(5)",
+    type: IndicatorTypes.CUSTOM,
+    name: "roc",
+    att: {
+      period: 5,
+    },
+  },
+  {
+    key: "ROC(9)",
+    type: IndicatorTypes.CUSTOM,
+    name: "roc",
+    att: {
+      period: 9,
+    },
+  },
+  {
+    key: "ROC(12)",
+    type: IndicatorTypes.CUSTOM,
+    name: "roc",
+    att: {
+      period: 12,
+    },
+  },
+  {
+    key: "ROC(20)",
+    type: IndicatorTypes.CUSTOM,
+    name: "roc",
+    att: {
+      period: 20,
+    },
+  },
+  {
+    key: "ROC(50)",
+    type: IndicatorTypes.CUSTOM,
+    name: "roc",
+    att: {
+      period: 50,
+    },
+  },
+  {
+    key: "ROC(100)",
+    type: IndicatorTypes.CUSTOM,
+    name: "roc",
+    att: {
+      period: 100,
+    },
+  },
+  {
+    key: "ROC(200)",
+    type: IndicatorTypes.CUSTOM,
+    name: "roc",
+    att: {
+      period: 200,
+    },
+  },
 ];
 
 module.exports = newIndicators;
