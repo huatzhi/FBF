@@ -3,6 +3,7 @@ const IndicatorFactory = {
   adx: require("./adx"),
   ao: require("./ao"),
   bb: require("./bb"),
+  cci: require("./cci"),
 };
 
 module.exports = IndicatorFactory;

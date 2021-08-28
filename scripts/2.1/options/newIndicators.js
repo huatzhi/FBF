@@ -128,6 +128,63 @@ const newIndicators = [
       stdDev: 2_5,
     },
   },
+  // cci
+  {
+    key: "CCI(5)",
+    type: IndicatorTypes.CUSTOM,
+    name: "cci",
+    att: {
+      period: 5,
+    },
+  },
+  {
+    key: "CCI(10)",
+    type: IndicatorTypes.CUSTOM,
+    name: "cci",
+    att: {
+      period: 10,
+    },
+  },
+  {
+    key: "CCI(20)",
+    type: IndicatorTypes.CUSTOM,
+    name: "cci",
+    att: {
+      period: 20,
+    },
+  },
+  {
+    key: "CCI(40)",
+    type: IndicatorTypes.CUSTOM,
+    name: "cci",
+    att: {
+      period: 40,
+    },
+  },
+  {
+    key: "CCI(72)",
+    type: IndicatorTypes.CUSTOM,
+    name: "cci",
+    att: {
+      period: 72,
+    },
+  },
+  {
+    key: "CCI(100)",
+    type: IndicatorTypes.CUSTOM,
+    name: "cci",
+    att: {
+      period: 100,
+    },
+  },
+  {
+    key: "CCI(200)",
+    type: IndicatorTypes.CUSTOM,
+    name: "cci",
+    att: {
+      period: 200,
+    },
+  },
 ];
 
 module.exports = newIndicators;
