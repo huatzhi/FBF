@@ -800,6 +800,48 @@ const newIndicators = [
       period: 200,
     },
   },
+  // Ichimoku Cloud
+  {
+    key: "IC(9,26,52)",
+    type: IndicatorTypes.PRICE,
+    name: "ichimoku",
+    att: {
+      conversionPeriod: 9,
+      basePeriod: 26,
+      spanPeriod: 52,
+      // displacement: 26,
+    },
+  },
+  {
+    key: "IC(8,22,44)",
+    type: IndicatorTypes.PRICE,
+    name: "ichimoku",
+    att: {
+      conversionPeriod: 8,
+      basePeriod: 22,
+      spanPeriod: 44,
+    },
+  },
+  {
+    key: "IC(9,30,60)",
+    type: IndicatorTypes.PRICE,
+    name: "ichimoku",
+    att: {
+      conversionPeriod: 9,
+      basePeriod: 30,
+      spanPeriod: 60,
+    },
+  },
+  {
+    key: "IC(12,24,120)",
+    type: IndicatorTypes.PRICE,
+    name: "ichimoku",
+    att: {
+      conversionPeriod: 12,
+      basePeriod: 24,
+      spanPeriod: 120,
+    },
+  },
 ];
 
 module.exports = newIndicators;

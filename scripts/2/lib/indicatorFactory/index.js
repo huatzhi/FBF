@@ -15,6 +15,7 @@ const IndicatorFactory = {
   wma: require("./wma"),
   wema: require("./wema"),
   wr: require("./wr"),
+  ichimoku: require("./ichimoku"),
 };
 
 module.exports = IndicatorFactory;
