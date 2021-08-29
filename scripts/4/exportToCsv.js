@@ -43,7 +43,8 @@ async function exportToCsv() {
   const indicatorHeaders = indicators
     .map((i) => IndicatorFactory[i.name].getCsvHeaderString(i))
     .join();
-  const candleHeaders = "O,H,L,C"; // backlog :: add date time category too later
+  const dtHeader = options.includeDateTime ? "datetime," : "";
+  const candleHeaders = dtHeader + "O,H,L,C"; // backlog :: add date time category too later
   const resultHeaders = "RESULT(LONG),RESULT(SHORT),RESULT(NONE)";
   const csvHeader = `${candleHeaders},${indicatorHeaders},${resultHeaders}`;
 
@@ -104,7 +105,10 @@ async function writeCsvFile(dataSet, indicators, csvHeader, resultObj) {
       if (!b?.result?.[resultObj.key]) {
         return "";
       }
-      const cValues = `${b.open},${b.high},${b.low},${b.close}`;
+      const dtValue = options.includeDateTime
+        ? `${new Date(b.datetime).toISOString()},`
+        : "";
+      const cValues = `${dtValue}${b.open},${b.high},${b.low},${b.close}`;
       const values = indicators
         .map((ind) => {
           const vals = IndicatorFactory[ind.name].getCsvContent(ind, b);
