@@ -33,14 +33,12 @@ async function main() {
   await new Promise(async (res) => {
     let scriptNo;
 
-    console.log("a");
     if (isInDebugMode()) {
       console.log("is debug mode");
       scriptNo = 4;
     } else {
       scriptNo = await getScriptNo();
     }
-    console.log("b");
 
     // end if scriptNo does not exist
     if (!Scripts[scriptNo]) {
