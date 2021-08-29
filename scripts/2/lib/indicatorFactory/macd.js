@@ -154,6 +154,29 @@ class MacdFactory {
       await this.fillNext();
     }
   }
+
+  /**
+   * Get csv header substring from indicator
+   * @param {object} ind
+   * @return {string}
+   */
+  static getCsvHeaderString(ind) {
+    const k = ind.key;
+    return `"${k}-macd","${k}-signal","${k}-histogram"`;
+  }
+
+  /**
+   * Get value of indicator from bar
+   * @param {object} ind
+   * @param {object} bar
+   * @return {(*|number)[]}
+   */
+  static getCsvContent(ind, bar) {
+    const k = ind.key;
+    const val = bar.indicators[k];
+
+    return [val.MACD, val.signal, val.histogram];
+  }
 }
 
 module.exports = MacdFactory;

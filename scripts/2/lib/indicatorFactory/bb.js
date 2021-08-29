@@ -146,6 +146,36 @@ class BBFactory {
       await this.fillNext();
     }
   }
+
+  /**
+   * Get csv header substring from indicator
+   * @param {object} ind
+   * @return {string}
+   */
+  static getCsvHeaderString(ind) {
+    const k = ind.key;
+    if (ind?.att?.ignoreMiddle) {
+      return `"${k}-upper","${k}-lower","${k}-pb"`;
+    }
+
+    return `"${k}-middle","${k}-upper","${k}-lower","${k}-pb"`;
+  }
+
+  /**
+   * Get value of indicator from bar
+   * @param {object} ind
+   * @param {object} bar
+   * @return {(*|number)[]}
+   */
+  static getCsvContent(ind, bar) {
+    const k = ind.key;
+    const val = bar.indicators[k];
+    if (ind?.att?.ignoreMiddle) {
+      return [val.upper, val.lower, val.pb];
+    }
+
+    return [val.middle, val.upper, val.lower, val.pb];
+  }
 }
 
 module.exports = BBFactory;

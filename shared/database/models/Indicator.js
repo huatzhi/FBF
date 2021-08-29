@@ -24,6 +24,8 @@ const IndicatorSchema = new mongoose.Schema(
   }
 );
 
+IndicatorSchema.index({ type: 1, key: 1 });
+
 /** @type {Model<Indicator>} */
 const Indicator = mongoose.model("Indicator", IndicatorSchema, "Indicator");
 

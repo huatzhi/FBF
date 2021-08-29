@@ -149,6 +149,25 @@ class CciFactory {
       await this.fillNext();
     }
   }
+
+  /**
+   * Get csv header substring from indicator
+   * @param {object} ind
+   * @return {string}
+   */
+  static getCsvHeaderString(ind) {
+    return `"${ind.key}"`;
+  }
+
+  /**
+   * Get value of indicator from bar
+   * @param {object} ind
+   * @param {object} bar
+   * @return {(*|number)[]}
+   */
+  static getCsvContent(ind, bar) {
+    return [bar.indicators[ind.key]];
+  }
 }
 
 module.exports = CciFactory;

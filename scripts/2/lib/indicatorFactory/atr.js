@@ -138,6 +138,26 @@ class AtrFactory {
       await this.fillNext();
     }
   }
+
+  /**
+   * Get csv header substring from indicator
+   * @param {object} ind
+   * @return {string}
+   */
+  static getCsvHeaderString(ind) {
+    return `"${ind.key}"`;
+  }
+
+  /**
+   * Get value of indicator from bar
+   * @param {object} ind
+   * @param {object} bar
+   * @return {(*|number)[]}
+   */
+  static getCsvContent(ind, bar) {
+    const p = ind.att.period ?? 14;
+    return [bar.atr[p]];
+  }
 }
 
 module.exports = AtrFactory;

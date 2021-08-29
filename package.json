@@ -1,14 +1,13 @@
 {
   "name": "bar-feature-builder",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Huat Zhi",
   "license": "ISC",
   "dependencies": {
     "async": "^3.2.1",
@@ -25,5 +24,13 @@
     "eslint-plugin-prettier": "^3.4.0",
     "jsdoc": "^3.6.7",
     "prettier": "^2.3.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huatzhi/FBF.git"
+  },
+  "bugs": {
+    "url": "https://github.com/huatzhi/FBF/issues"
+  },
+  "homepage": "https://github.com/huatzhi/FBF#readme"
 }

@@ -169,6 +169,29 @@ class KstFactory {
       await this.fillNext();
     }
   }
+
+  /**
+   * Get csv header substring from indicator
+   * @param {object} ind
+   * @return {string}
+   */
+  static getCsvHeaderString(ind) {
+    const k = ind.key;
+    return `"${k}-kst","${k}-signal"`;
+  }
+
+  /**
+   * Get value of indicator from bar
+   * @param {object} ind
+   * @param {object} bar
+   * @return {(*|number)[]}
+   */
+  static getCsvContent(ind, bar) {
+    const k = ind.key;
+    const val = bar.indicators[k];
+
+    return [val.kst, val.signal];
+  }
 }
 
 module.exports = KstFactory;

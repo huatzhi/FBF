@@ -1,6 +1,15 @@
 const prompt = require("prompt");
 const DB = require("./shared/database/loader");
 const Scripts = require("./scripts/index");
+const inspector = require("inspector");
+
+/**
+ * is debug mode
+ * @return {boolean}
+ */
+function isInDebugMode() {
+  return inspector.url() !== undefined;
+}
 
 const schema = {
   properties: {
@@ -22,7 +31,16 @@ const schema = {
  */
 async function main() {
   await new Promise(async (res) => {
-    const scriptNo = await getScriptNo();
+    let scriptNo;
+
+    console.log("a");
+    if (isInDebugMode()) {
+      console.log("is debug mode");
+      scriptNo = 4;
+    } else {
+      scriptNo = await getScriptNo();
+    }
+    console.log("b");
 
     // end if scriptNo does not exist
     if (!Scripts[scriptNo]) {
@@ -58,6 +76,9 @@ async function main() {
      *
      * 3.1 - Add new result format
      *
+     * 4 - Output dataSet to CSV
+     * Config can adjust what should be in csv, by default, everything would be added.
+     * It will be separated by dataset per file.
      */
 
     res();

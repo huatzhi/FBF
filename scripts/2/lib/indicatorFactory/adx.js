@@ -140,6 +140,29 @@ class AdxFactory {
       await this.fillNext();
     }
   }
+
+  /**
+   * Get csv header substring from indicator
+   * @param {object} ind
+   * @return {string}
+   */
+  static getCsvHeaderString(ind) {
+    const k = ind.key;
+    return `"${k}-adx","${k}-pdi","${k}-mdi"`;
+  }
+
+  /**
+   * Get value of indicator from bar
+   * @param {object} ind
+   * @param {object} bar
+   * @return {(*|number)[]}
+   */
+  static getCsvContent(ind, bar) {
+    const k = ind.key;
+    const val = bar.indicators[k];
+
+    return [val.adx, val.pdi, val.mdi];
+  }
 }
 
 module.exports = AdxFactory;
