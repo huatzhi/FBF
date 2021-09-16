@@ -2,7 +2,7 @@ const options = {
   instrumentsLimit: [],
   timeFrameLimit: [],
   indicatorKeyLimit: [],
-  indicatorTypeLimit: [],
+  indicatorTypeLimit: ["custom"],
 };
 
 module.exports = options;

@@ -5,6 +5,7 @@ const Scripts = {
   3: require("./3/fillResult"),
   3.1: require("./3.1/addNewResult"),
   4: require("./4/exportToCsv"),
+  4.1: require("./4.1/exportToCsv"),
 };
 
 module.exports = Scripts;

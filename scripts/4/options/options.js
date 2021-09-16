@@ -4,7 +4,7 @@ const options = {
   indicatorKeyLimit: [],
   indicatorTypeLimit: [],
   resultKey: "Basic(14,1_2,3_3,10)",
-  includeDateTime: false,
+  includeDateTime: true,
 };
 
 module.exports = options;
