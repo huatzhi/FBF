@@ -74,7 +74,13 @@ async function main() {
      *
      * 3.1 - Add new result format
      *
-     * 4 - Output dataSet to CSV
+     * 4 -
+     *
+     * 4.1 - Output dataSet to CSV
+     * Config can adjust what should be in csv, by default, everything would be added.
+     * It will be separated by dataset per file.
+     *
+     * 4.2 - Output dataSet to CSV
      * Config can adjust what should be in csv, by default, everything would be added.
      * It will be separated by dataset per file.
      */

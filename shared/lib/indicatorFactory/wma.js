@@ -1,12 +1,12 @@
-const WR = require("technicalindicators").WilliamsR;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const WMA = require("technicalindicators").WMA;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up WilliamR values
+ * Functions that fill up WMA values
  */
-class WrFactory {
+class WmaFactory {
   /**
-   * Setup a factory that fill up WilliamR values of certain dataSet
+   * Setup a factory that fill up WMA values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -35,7 +35,7 @@ class WrFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.wr = new WR({ period: this.period, high: [], low: [], close: [] });
+      this.wma = new WMA({ period: this.period, values: [] });
       return;
     }
 
@@ -56,11 +56,9 @@ class WrFactory {
       .limit(this.period)
       .lean();
 
-    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
-    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
-    const close = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
+    const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.wr = new WR({ period: this.period, high, low, close });
+    this.wma = new WMA({ period: this.period, values });
   }
 
   /**
@@ -95,11 +93,7 @@ class WrFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.wr.nextValue({
-        high: bar.high,
-        low: bar.low,
-        close: bar.close,
-      });
+      const result = this.wma.nextValue(bar.close);
 
       const output = {
         updateOne: {
@@ -161,4 +155,4 @@ class WrFactory {
   }
 }
 
-module.exports = WrFactory;
+module.exports = WmaFactory;

@@ -1,5 +1,5 @@
 const ADX = require("technicalindicators").ADX;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
  * Functions that fill up ADX values

@@ -1,12 +1,12 @@
-const TRIX = require("technicalindicators").TRIX;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const ATR = require("technicalindicators").ATR;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up TRIX values
+ * Functions that fill up ATR values
  */
-class TrixFactory {
+class AtrFactory {
   /**
-   * Setup a factory that fill up TRIX values of certain dataSet
+   * Setup a factory that fill up ATR values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -21,9 +21,7 @@ class TrixFactory {
     this.lastProcessedCandle = dataSet.processed?.indicator?.[key];
     this.lastBar = dataSet.lastBar;
     this.key = key;
-
     this.period = att.period ?? 14;
-
     this.initialized = false;
   }
 
@@ -35,7 +33,7 @@ class TrixFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.trix = new TRIX({ period: this.period, values: [] });
+      this.atr = new ATR({ period: this.period, high: [], low: [], close: [] });
       return;
     }
 
@@ -56,9 +54,11 @@ class TrixFactory {
       .limit(this.period)
       .lean();
 
-    const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
+    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
+    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
+    const close = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.trix = new TRIX({ period: this.period, values });
+    this.atr = new ATR({ period: this.period, high, low, close });
   }
 
   /**
@@ -68,8 +68,6 @@ class TrixFactory {
    * @return {Promise<void>}
    */
   async fillNext(batch = 100) {
-    const updateKey = `indicators.${this.key}`;
-
     const barQuery = {
       instrument: this.instrument,
       timeFrame: this.timeFrame,
@@ -93,12 +91,18 @@ class TrixFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.trix.nextValue(bar.close);
+      const updateKey = `atr.${this.period}`;
+
+      const result = this.atr.nextValue({
+        high: bar.high,
+        low: bar.low,
+        close: bar.close,
+      });
 
       const output = {
         updateOne: {
           filter: { _id: bar._id },
-          update: { [updateKey]: result },
+          update: { [updateKey]: result }, // for other indicators it suppose to be `indicator.${this.key}`
         },
       };
 
@@ -151,8 +155,11 @@ class TrixFactory {
    * @return {(*|number)[]}
    */
   static getCsvContent(ind, bar) {
-    return [bar.indicators[ind.key]];
+    const p = ind.att.period ?? 14;
+    return [bar.atr[p]];
   }
 }
 
-module.exports = TrixFactory;
+module.exports = AtrFactory;
+
+// todo :: use sma ATR instead

@@ -1,12 +1,12 @@
-const RSI = require("technicalindicators").RSI;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const WR = require("technicalindicators").WilliamsR;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up Relative Strength Index values
+ * Functions that fill up WilliamR values
  */
-class RsiFactory {
+class WrFactory {
   /**
-   * Setup a factory that fill up Relative Strength Index values of certain dataSet
+   * Setup a factory that fill up WilliamR values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -35,7 +35,7 @@ class RsiFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.rsi = new RSI({ period: this.period, values: [] });
+      this.wr = new WR({ period: this.period, high: [], low: [], close: [] });
       return;
     }
 
@@ -56,9 +56,11 @@ class RsiFactory {
       .limit(this.period)
       .lean();
 
-    const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
+    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
+    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
+    const close = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.rsi = new RSI({ period: this.period, values });
+    this.wr = new WR({ period: this.period, high, low, close });
   }
 
   /**
@@ -93,7 +95,11 @@ class RsiFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.rsi.nextValue(bar.close);
+      const result = this.wr.nextValue({
+        high: bar.high,
+        low: bar.low,
+        close: bar.close,
+      });
 
       const output = {
         updateOne: {
@@ -155,4 +161,4 @@ class RsiFactory {
   }
 }
 
-module.exports = RsiFactory;
+module.exports = WrFactory;

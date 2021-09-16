@@ -1,15 +1,14 @@
-const CCI = require("technicalindicators").CCI;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const { Bar, DataSet } = require("../../../database/models/index");
 
 /**
- * Functions that fill up CCI values
+ * Handle most of the candle determination
  */
-class CciFactory {
+class CandleStickFactory {
   /**
-   * Setup a factory that fill up CCI values of certain dataSet
+   * Setup factory
    * @param {object} dataSet
    * @param {string} key
-   * @param {object} att
+   * @param {object} att - generally empty
    */
   constructor(dataSet, key, att) {
     this.dataSetId = dataSet._id;
@@ -22,7 +21,10 @@ class CciFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.period = att.period ?? 20;
+    this.pastFiveOpen = [];
+    this.pastFiveHigh = [];
+    this.pastFiveLow = [];
+    this.pastFiveClose = [];
 
     this.initialized = false;
   }
@@ -34,14 +36,8 @@ class CciFactory {
    */
   async init() {
     this.initialized = true;
+
     if (!this.lastProcessedCandle) {
-      this.cci = new CCI({
-        period: this.period,
-        open: [],
-        high: [],
-        low: [],
-        close: [],
-      });
       return;
     }
 
@@ -56,18 +52,47 @@ class CciFactory {
         timeFrame: this.timeFrame,
         datetime: { $lte: this.lastProcessedCandle },
       },
-      { high: 1, low: 1, close: 1 }
+      { open: 1, high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(this.period)
+      .limit(5)
       .lean();
 
-    const open = pastProcessedCandleInPeriod.map((b) => b.open).reverse();
-    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
-    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
-    const close = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
+    this.pastFiveOpen = pastProcessedCandleInPeriod
+      .map((b) => b.open)
+      .reverse();
+    this.pastFiveHigh = pastProcessedCandleInPeriod
+      .map((b) => b.high)
+      .reverse();
+    this.pastFiveLow = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
+    this.pastFiveClose = pastProcessedCandleInPeriod
+      .map((b) => b.close)
+      .reverse();
+  }
 
-    this.cci = new CCI({ period: this.period, open, high, low, close });
+  /**
+   * Use past five candle to determine candle stick pattern, return null if not enough to determine
+   * @private
+   * @abstract
+   * @return {number | null}
+   */
+  hasPattern() {
+    throw new Error("this function require implementation");
+  }
+
+  /**
+   * Use past five candle to determine candle stick pattern, return null if not enough to determine
+   * @private
+   * @static
+   * @param {array} arr
+   * @param {any} value
+   * @return {void}
+   */
+  static appendMaxFive(arr, value) {
+    arr.push(value);
+    if (arr.length > 5) {
+      arr.shift();
+    }
   }
 
   /**
@@ -103,12 +128,12 @@ class CciFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.cci.nextValue({
-        open: bar.open,
-        high: bar.high,
-        low: bar.low,
-        close: bar.close,
-      });
+      CandleStickFactory.appendMaxFive(this.pastFiveOpen, bar.open);
+      CandleStickFactory.appendMaxFive(this.pastFiveHigh, bar.high);
+      CandleStickFactory.appendMaxFive(this.pastFiveLow, bar.low);
+      CandleStickFactory.appendMaxFive(this.pastFiveClose, bar.close);
+
+      const result = this.hasPattern();
 
       const output = {
         updateOne: {
@@ -117,7 +142,7 @@ class CciFactory {
         },
       };
 
-      if (!result) {
+      if (result !== 0 && result !== 1) {
         output.updateOne.update[updateKey] = null;
         output.updateOne.update.disqualified = true;
       }
@@ -156,7 +181,7 @@ class CciFactory {
    * @return {string}
    */
   static getCsvHeaderString(ind) {
-    return `"${ind.key}"`;
+    return ind.key;
   }
 
   /**
@@ -170,4 +195,4 @@ class CciFactory {
   }
 }
 
-module.exports = CciFactory;
+module.exports = { CandleStickFactory };

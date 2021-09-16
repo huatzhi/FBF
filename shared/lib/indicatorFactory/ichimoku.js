@@ -1,12 +1,12 @@
-const EMA = require("technicalindicators").EMA;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const IchimokuCloud = require("technicalindicators").IchimokuCloud;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up EMA values
+ * Functions that fill up IchimokuCloud values
  */
-class EmaFactory {
+class ICFactory {
   /**
-   * Setup a factory that fill up EMA values of certain dataSet
+   * Setup a factory that fill up IchimokuCloud values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,7 +22,10 @@ class EmaFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.period = att.period ?? 14;
+    this.conversionPeriod = att.conversionPeriod ?? 9;
+    this.basePeriod = att.basePeriod ?? 26;
+    this.spanPeriod = att.spanPeriod ?? 52;
+    this.displacement = att.displacement ?? this.basePeriod;
 
     this.initialized = false;
   }
@@ -35,7 +38,14 @@ class EmaFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.ema = new EMA({ period: this.period, values: [] });
+      this.ic = new IchimokuCloud({
+        conversionPeriod: this.conversionPeriod,
+        basePeriod: this.basePeriod,
+        spanPeriod: this.spanPeriod,
+        displacement: this.displacement,
+        high: [],
+        low: [],
+      });
       return;
     }
 
@@ -44,6 +54,8 @@ class EmaFactory {
       return;
     }
 
+    const barsProbablyRequired =
+      Math.max(this.conversionPeriod, this.basePeriod, this.spanPeriod) + 1;
     const pastProcessedCandleInPeriod = await Bar.find(
       {
         instrument: this.instrument,
@@ -53,12 +65,20 @@ class EmaFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(this.period)
+      .limit(barsProbablyRequired)
       .lean();
 
-    const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
+    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
+    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
 
-    this.ema = new EMA({ period: this.period, values });
+    this.ic = new IchimokuCloud({
+      conversionPeriod: this.conversionPeriod,
+      basePeriod: this.basePeriod,
+      spanPeriod: this.spanPeriod,
+      displacement: this.displacement,
+      high,
+      low,
+    });
   }
 
   /**
@@ -78,6 +98,7 @@ class EmaFactory {
       barQuery.datetime = { $gt: this.lastProcessedCandle };
     }
     const bars = await Bar.find(barQuery, {
+      open: 1,
       high: 1,
       low: 1,
       close: 1,
@@ -93,7 +114,12 @@ class EmaFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.ema.nextValue(bar.close);
+      const result = this.ic.nextValue({
+        open: bar.open,
+        high: bar.high,
+        low: bar.low,
+        close: bar.close,
+      });
 
       const output = {
         updateOne: {
@@ -141,7 +167,8 @@ class EmaFactory {
    * @return {string}
    */
   static getCsvHeaderString(ind) {
-    return `"${ind.key}"`;
+    const k = ind.key;
+    return `"${k}-conversion","${k}-base","${k}-spanA","${k}-spanB"`;
   }
 
   /**
@@ -151,8 +178,11 @@ class EmaFactory {
    * @return {(*|number)[]}
    */
   static getCsvContent(ind, bar) {
-    return [bar.indicators[ind.key]];
+    const k = ind.key;
+    const val = bar.indicators[k];
+
+    return [val.conversion, val.base, val.spanA, val.spanB];
   }
 }
 
-module.exports = EmaFactory;
+module.exports = ICFactory;

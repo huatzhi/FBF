@@ -1,12 +1,12 @@
-const WMA = require("technicalindicators").WMA;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const TRIX = require("technicalindicators").TRIX;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up WMA values
+ * Functions that fill up TRIX values
  */
-class WmaFactory {
+class TrixFactory {
   /**
-   * Setup a factory that fill up WMA values of certain dataSet
+   * Setup a factory that fill up TRIX values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -35,7 +35,7 @@ class WmaFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.wma = new WMA({ period: this.period, values: [] });
+      this.trix = new TRIX({ period: this.period, values: [] });
       return;
     }
 
@@ -58,7 +58,7 @@ class WmaFactory {
 
     const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.wma = new WMA({ period: this.period, values });
+    this.trix = new TRIX({ period: this.period, values });
   }
 
   /**
@@ -93,7 +93,7 @@ class WmaFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.wma.nextValue(bar.close);
+      const result = this.trix.nextValue(bar.close);
 
       const output = {
         updateOne: {
@@ -155,4 +155,4 @@ class WmaFactory {
   }
 }
 
-module.exports = WmaFactory;
+module.exports = TrixFactory;

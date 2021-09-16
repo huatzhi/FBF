@@ -1,7 +1,7 @@
 const { DataSet, Indicator } = require("../../shared/database/models/index");
 const options = require("./options/options");
 const { eachLimit } = require("async");
-const IndicatorFactories = require("./lib/indicatorFactory/index");
+const IndicatorFactories = require("../../shared/lib/indicatorFactory/index");
 const {
   getAllCombinationsBetween,
 } = require("../../shared/services/combination.service");

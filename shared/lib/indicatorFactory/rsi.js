@@ -1,12 +1,12 @@
-const MACD = require("technicalindicators").MACD;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const RSI = require("technicalindicators").RSI;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up MACD values
+ * Functions that fill up Relative Strength Index values
  */
-class MacdFactory {
+class RsiFactory {
   /**
-   * Setup a factory that fill up MACD values of certain dataSet
+   * Setup a factory that fill up Relative Strength Index values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,11 +22,7 @@ class MacdFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.fastPeriod = att.fastPeriod ?? 12;
-    this.slowPeriod = att.slowPeriod ?? 26;
-    this.signalPeriod = att.signalPeriod ?? 9;
-    this.SimpleMAOscillator = att.SimpleMAOscillator ?? false;
-    this.SimpleMASignal = att.SimpleMASignal ?? false;
+    this.period = att.period ?? 14;
 
     this.initialized = false;
   }
@@ -39,14 +35,7 @@ class MacdFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.macd = new MACD({
-        values: [],
-        fastPeriod: this.fastPeriod,
-        slowPeriod: this.slowPeriod,
-        signalPeriod: this.signalPeriod,
-        SimpleMAOscillator: this.SimpleMAOscillator,
-        SimpleMASignal: this.SimpleMASignal,
-      });
+      this.rsi = new RSI({ period: this.period, values: [] });
       return;
     }
 
@@ -54,8 +43,6 @@ class MacdFactory {
       this.completed = true;
       return;
     }
-
-    const barRequired = this.slowPeriod + this.signalPeriod;
 
     const pastProcessedCandleInPeriod = await Bar.find(
       {
@@ -66,19 +53,12 @@ class MacdFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(barRequired)
+      .limit(this.period)
       .lean();
 
     const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.macd = new MACD({
-      values,
-      fastPeriod: this.fastPeriod,
-      slowPeriod: this.slowPeriod,
-      signalPeriod: this.signalPeriod,
-      SimpleMAOscillator: this.SimpleMAOscillator,
-      SimpleMASignal: this.SimpleMASignal,
-    });
+    this.rsi = new RSI({ period: this.period, values });
   }
 
   /**
@@ -113,7 +93,7 @@ class MacdFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.macd.nextValue(bar.close);
+      const result = this.rsi.nextValue(bar.close);
 
       const output = {
         updateOne: {
@@ -161,8 +141,7 @@ class MacdFactory {
    * @return {string}
    */
   static getCsvHeaderString(ind) {
-    const k = ind.key;
-    return `"${k}-macd","${k}-signal","${k}-histogram"`;
+    return `"${ind.key}"`;
   }
 
   /**
@@ -172,11 +151,8 @@ class MacdFactory {
    * @return {(*|number)[]}
    */
   static getCsvContent(ind, bar) {
-    const k = ind.key;
-    const val = bar.indicators[k];
-
-    return [val.MACD, val.signal, val.histogram];
+    return [bar.indicators[ind.key]];
   }
 }
 
-module.exports = MacdFactory;
+module.exports = RsiFactory;

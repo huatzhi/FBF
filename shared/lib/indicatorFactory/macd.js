@@ -1,12 +1,12 @@
-const KST = require("technicalindicators").KST;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const MACD = require("technicalindicators").MACD;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up Know Sure Thing values
+ * Functions that fill up MACD values
  */
-class KstFactory {
+class MacdFactory {
   /**
-   * Setup a factory that fill up Know Sure Thing values of certain dataSet
+   * Setup a factory that fill up MACD values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,15 +22,11 @@ class KstFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.ROCPer1 = att.ROCPer1 ?? 10;
-    this.ROCPer2 = att.ROCPer2 ?? 15;
-    this.ROCPer3 = att.ROCPer3 ?? 20;
-    this.ROCPer4 = att.ROCPer4 ?? 30;
-    this.SMAROCPer1 = att.SMAROCPer1 ?? 10;
-    this.SMAROCPer2 = att.SMAROCPer2 ?? 10;
-    this.SMAROCPer3 = att.SMAROCPer3 ?? 10;
-    this.SMAROCPer4 = att.SMAROCPer4 ?? 15;
+    this.fastPeriod = att.fastPeriod ?? 12;
+    this.slowPeriod = att.slowPeriod ?? 26;
     this.signalPeriod = att.signalPeriod ?? 9;
+    this.SimpleMAOscillator = att.SimpleMAOscillator ?? false;
+    this.SimpleMASignal = att.SimpleMASignal ?? false;
 
     this.initialized = false;
   }
@@ -43,17 +39,13 @@ class KstFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.kst = new KST({
+      this.macd = new MACD({
         values: [],
-        ROCPer1: this.ROCPer1,
-        ROCPer2: this.ROCPer2,
-        ROCPer3: this.ROCPer3,
-        ROCPer4: this.ROCPer4,
-        SMAROCPer1: this.SMAROCPer1,
-        SMAROCPer2: this.SMAROCPer2,
-        SMAROCPer3: this.SMAROCPer3,
-        SMAROCPer4: this.SMAROCPer4,
+        fastPeriod: this.fastPeriod,
+        slowPeriod: this.slowPeriod,
         signalPeriod: this.signalPeriod,
+        SimpleMAOscillator: this.SimpleMAOscillator,
+        SimpleMASignal: this.SimpleMASignal,
       });
       return;
     }
@@ -63,7 +55,7 @@ class KstFactory {
       return;
     }
 
-    const requiredBars = this.ROCPer4 + this.SMAROCPer4 + this.signalPeriod;
+    const barRequired = this.slowPeriod + this.signalPeriod;
 
     const pastProcessedCandleInPeriod = await Bar.find(
       {
@@ -74,22 +66,18 @@ class KstFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(requiredBars)
+      .limit(barRequired)
       .lean();
 
     const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.kst = new KST({
+    this.macd = new MACD({
       values,
-      ROCPer1: this.ROCPer1,
-      ROCPer2: this.ROCPer2,
-      ROCPer3: this.ROCPer3,
-      ROCPer4: this.ROCPer4,
-      SMAROCPer1: this.SMAROCPer1,
-      SMAROCPer2: this.SMAROCPer2,
-      SMAROCPer3: this.SMAROCPer3,
-      SMAROCPer4: this.SMAROCPer4,
+      fastPeriod: this.fastPeriod,
+      slowPeriod: this.slowPeriod,
       signalPeriod: this.signalPeriod,
+      SimpleMAOscillator: this.SimpleMAOscillator,
+      SimpleMASignal: this.SimpleMASignal,
     });
   }
 
@@ -125,7 +113,7 @@ class KstFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.kst.nextValue(bar.close);
+      const result = this.macd.nextValue(bar.close);
 
       const output = {
         updateOne: {
@@ -136,9 +124,6 @@ class KstFactory {
 
       if (!result) {
         output.updateOne.update[updateKey] = null;
-      }
-
-      if (!result?.signal) {
         output.updateOne.update.disqualified = true;
       }
 
@@ -177,7 +162,7 @@ class KstFactory {
    */
   static getCsvHeaderString(ind) {
     const k = ind.key;
-    return `"${k}-kst","${k}-signal"`;
+    return `"${k}-macd","${k}-signal","${k}-histogram"`;
   }
 
   /**
@@ -190,8 +175,8 @@ class KstFactory {
     const k = ind.key;
     const val = bar.indicators[k];
 
-    return [val.kst, val.signal];
+    return [val.MACD, val.signal, val.histogram];
   }
 }
 
-module.exports = KstFactory;
+module.exports = MacdFactory;

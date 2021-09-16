@@ -1,12 +1,12 @@
-const ROC = require("technicalindicators").ROC;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const AO = require("technicalindicators").AwesomeOscillator;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up Rate of Change values
+ * Functions that fill up Awesome Oscillator values
  */
-class RocFactory {
+class AOFactory {
   /**
-   * Setup a factory that fill up Rate of Change values of certain dataSet
+   * Setup a factory that fill up Awesome Oscillator values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,7 +22,8 @@ class RocFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.period = att.period ?? 12;
+    this.fastPeriod = att.fastPeriod ?? 5;
+    this.slowPeriod = att.slowPeriod ?? 34;
 
     this.initialized = false;
   }
@@ -35,7 +36,12 @@ class RocFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.roc = new ROC({ period: this.period, values: [] });
+      this.ao = new AO({
+        fastPeriod: this.fastPeriod,
+        slowPeriod: this.slowPeriod,
+        high: [],
+        low: [],
+      });
       return;
     }
 
@@ -53,12 +59,18 @@ class RocFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(this.period)
+      .limit(this.slowPeriod)
       .lean();
 
-    const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
+    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
+    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
 
-    this.roc = new ROC({ period: this.period, values });
+    this.ao = new AO({
+      fastPeriod: this.fastPeriod,
+      slowPeriod: this.slowPeriod,
+      high,
+      low,
+    });
   }
 
   /**
@@ -93,7 +105,11 @@ class RocFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.roc.nextValue(bar.close);
+      const result = this.ao.nextValue({
+        high: bar.high,
+        low: bar.low,
+        close: bar.close,
+      });
 
       const output = {
         updateOne: {
@@ -155,4 +171,4 @@ class RocFactory {
   }
 }
 
-module.exports = RocFactory;
+module.exports = AOFactory;

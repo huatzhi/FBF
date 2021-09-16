@@ -1,5 +1,5 @@
 const WEMA = require("technicalindicators").WEMA;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
  * Functions that fill up WEMA values

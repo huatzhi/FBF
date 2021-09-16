@@ -1,12 +1,12 @@
-const KD = require("technicalindicators").Stochastic;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const CCI = require("technicalindicators").CCI;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up Stochastic Oscillator values
+ * Functions that fill up CCI values
  */
-class StochasticFactory {
+class CciFactory {
   /**
-   * Setup a factory that fill up Stochastic Oscillator values of certain dataSet
+   * Setup a factory that fill up CCI values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,8 +22,7 @@ class StochasticFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.period = att.period ?? 14;
-    this.signalPeriod = att.signalPeriod ?? 3;
+    this.period = att.period ?? 20;
 
     this.initialized = false;
   }
@@ -36,9 +35,9 @@ class StochasticFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.kd = new KD({
+      this.cci = new CCI({
         period: this.period,
-        signalPeriod: this.signalPeriod,
+        open: [],
         high: [],
         low: [],
         close: [],
@@ -51,8 +50,6 @@ class StochasticFactory {
       return;
     }
 
-    const requiredBars = this.period + this.signalPeriod;
-
     const pastProcessedCandleInPeriod = await Bar.find(
       {
         instrument: this.instrument,
@@ -62,20 +59,15 @@ class StochasticFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(requiredBars)
+      .limit(this.period)
       .lean();
 
+    const open = pastProcessedCandleInPeriod.map((b) => b.open).reverse();
     const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
     const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
     const close = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.kd = new KD({
-      period: this.period,
-      signalPeriod: this.signalPeriod,
-      high,
-      low,
-      close,
-    });
+    this.cci = new CCI({ period: this.period, open, high, low, close });
   }
 
   /**
@@ -95,6 +87,7 @@ class StochasticFactory {
       barQuery.datetime = { $gt: this.lastProcessedCandle };
     }
     const bars = await Bar.find(barQuery, {
+      open: 1,
       high: 1,
       low: 1,
       close: 1,
@@ -110,9 +103,8 @@ class StochasticFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.kd.nextValue({
-        period: this.period,
-        signalPeriod: this.signalPeriod,
+      const result = this.cci.nextValue({
+        open: bar.open,
         high: bar.high,
         low: bar.low,
         close: bar.close,
@@ -164,8 +156,7 @@ class StochasticFactory {
    * @return {string}
    */
   static getCsvHeaderString(ind) {
-    const k = ind.key;
-    return `"${k}-k","${k}-d"`;
+    return `"${ind.key}"`;
   }
 
   /**
@@ -175,11 +166,8 @@ class StochasticFactory {
    * @return {(*|number)[]}
    */
   static getCsvContent(ind, bar) {
-    const k = ind.key;
-    const val = bar.indicators[k];
-
-    return [val.k, val.d];
+    return [bar.indicators[ind.key]];
   }
 }
 
-module.exports = StochasticFactory;
+module.exports = CciFactory;

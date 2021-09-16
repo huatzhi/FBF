@@ -1,14 +1,15 @@
-const { Bar, DataSet } = require("../../../../../shared/database/models/index");
+const KD = require("technicalindicators").Stochastic;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Handle most of the candle determination
+ * Functions that fill up Stochastic Oscillator values
  */
-class CandleStickFactory {
+class StochasticFactory {
   /**
-   * Setup factory
+   * Setup a factory that fill up Stochastic Oscillator values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
-   * @param {object} att - generally empty
+   * @param {object} att
    */
   constructor(dataSet, key, att) {
     this.dataSetId = dataSet._id;
@@ -21,10 +22,8 @@ class CandleStickFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.pastFiveOpen = [];
-    this.pastFiveHigh = [];
-    this.pastFiveLow = [];
-    this.pastFiveClose = [];
+    this.period = att.period ?? 14;
+    this.signalPeriod = att.signalPeriod ?? 3;
 
     this.initialized = false;
   }
@@ -36,8 +35,14 @@ class CandleStickFactory {
    */
   async init() {
     this.initialized = true;
-
     if (!this.lastProcessedCandle) {
+      this.kd = new KD({
+        period: this.period,
+        signalPeriod: this.signalPeriod,
+        high: [],
+        low: [],
+        close: [],
+      });
       return;
     }
 
@@ -46,53 +51,31 @@ class CandleStickFactory {
       return;
     }
 
+    const requiredBars = this.period + this.signalPeriod;
+
     const pastProcessedCandleInPeriod = await Bar.find(
       {
         instrument: this.instrument,
         timeFrame: this.timeFrame,
         datetime: { $lte: this.lastProcessedCandle },
       },
-      { open: 1, high: 1, low: 1, close: 1 }
+      { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(5)
+      .limit(requiredBars)
       .lean();
 
-    this.pastFiveOpen = pastProcessedCandleInPeriod
-      .map((b) => b.open)
-      .reverse();
-    this.pastFiveHigh = pastProcessedCandleInPeriod
-      .map((b) => b.high)
-      .reverse();
-    this.pastFiveLow = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
-    this.pastFiveClose = pastProcessedCandleInPeriod
-      .map((b) => b.close)
-      .reverse();
-  }
+    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
+    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
+    const close = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-  /**
-   * Use past five candle to determine candle stick pattern, return null if not enough to determine
-   * @private
-   * @abstract
-   * @return {number | null}
-   */
-  hasPattern() {
-    throw new Error("this function require implementation");
-  }
-
-  /**
-   * Use past five candle to determine candle stick pattern, return null if not enough to determine
-   * @private
-   * @static
-   * @param {array} arr
-   * @param {any} value
-   * @return {void}
-   */
-  static appendMaxFive(arr, value) {
-    arr.push(value);
-    if (arr.length > 5) {
-      arr.shift();
-    }
+    this.kd = new KD({
+      period: this.period,
+      signalPeriod: this.signalPeriod,
+      high,
+      low,
+      close,
+    });
   }
 
   /**
@@ -112,7 +95,6 @@ class CandleStickFactory {
       barQuery.datetime = { $gt: this.lastProcessedCandle };
     }
     const bars = await Bar.find(barQuery, {
-      open: 1,
       high: 1,
       low: 1,
       close: 1,
@@ -128,12 +110,13 @@ class CandleStickFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      CandleStickFactory.appendMaxFive(this.pastFiveOpen, bar.open);
-      CandleStickFactory.appendMaxFive(this.pastFiveHigh, bar.high);
-      CandleStickFactory.appendMaxFive(this.pastFiveLow, bar.low);
-      CandleStickFactory.appendMaxFive(this.pastFiveClose, bar.close);
-
-      const result = this.hasPattern();
+      const result = this.kd.nextValue({
+        period: this.period,
+        signalPeriod: this.signalPeriod,
+        high: bar.high,
+        low: bar.low,
+        close: bar.close,
+      });
 
       const output = {
         updateOne: {
@@ -142,7 +125,7 @@ class CandleStickFactory {
         },
       };
 
-      if (result !== 0 && result !== 1) {
+      if (!result) {
         output.updateOne.update[updateKey] = null;
         output.updateOne.update.disqualified = true;
       }
@@ -181,7 +164,8 @@ class CandleStickFactory {
    * @return {string}
    */
   static getCsvHeaderString(ind) {
-    return ind.key;
+    const k = ind.key;
+    return `"${k}-k","${k}-d"`;
   }
 
   /**
@@ -191,8 +175,11 @@ class CandleStickFactory {
    * @return {(*|number)[]}
    */
   static getCsvContent(ind, bar) {
-    return [bar.indicators[ind.key]];
+    const k = ind.key;
+    const val = bar.indicators[k];
+
+    return [val.k, val.d];
   }
 }
 
-module.exports = { CandleStickFactory };
+module.exports = StochasticFactory;

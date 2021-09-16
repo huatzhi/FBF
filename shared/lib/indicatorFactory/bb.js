@@ -1,12 +1,12 @@
-const ATR = require("technicalindicators").ATR;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const BB = require("technicalindicators").BollingerBands;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up ATR values
+ * Functions that fill up Bollinger Bands values
  */
-class AtrFactory {
+class BBFactory {
   /**
-   * Setup a factory that fill up ATR values of certain dataSet
+   * Setup a factory that fill up Bollinger Bands values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -21,7 +21,11 @@ class AtrFactory {
     this.lastProcessedCandle = dataSet.processed?.indicator?.[key];
     this.lastBar = dataSet.lastBar;
     this.key = key;
+
     this.period = att.period ?? 14;
+    this.stdDev = att.stdDev ?? 2;
+    this.ignoreMiddle = att.ignoreMiddle ?? false;
+
     this.initialized = false;
   }
 
@@ -33,7 +37,11 @@ class AtrFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.atr = new ATR({ period: this.period, high: [], low: [], close: [] });
+      this.bb = new BB({
+        period: this.period,
+        stdDev: this.stdDev,
+        values: [],
+      });
       return;
     }
 
@@ -54,11 +62,9 @@ class AtrFactory {
       .limit(this.period)
       .lean();
 
-    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
-    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
-    const close = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
+    const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.atr = new ATR({ period: this.period, high, low, close });
+    this.bb = new BB({ period: this.period, stdDev: this.stdDev, values });
   }
 
   /**
@@ -68,6 +74,8 @@ class AtrFactory {
    * @return {Promise<void>}
    */
   async fillNext(batch = 100) {
+    const updateKey = `indicators.${this.key}`;
+
     const barQuery = {
       instrument: this.instrument,
       timeFrame: this.timeFrame,
@@ -91,18 +99,18 @@ class AtrFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const updateKey = `atr.${this.period}`;
+      const result = this.bb.nextValue(bar.close);
 
-      const result = this.atr.nextValue({
-        high: bar.high,
-        low: bar.low,
-        close: bar.close,
-      });
+      if (this.ignoreMiddle) {
+        if (result?.middle) {
+          delete result?.middle;
+        }
+      }
 
       const output = {
         updateOne: {
           filter: { _id: bar._id },
-          update: { [updateKey]: result }, // for other indicators it suppose to be `indicator.${this.key}`
+          update: { [updateKey]: result },
         },
       };
 
@@ -145,7 +153,12 @@ class AtrFactory {
    * @return {string}
    */
   static getCsvHeaderString(ind) {
-    return `"${ind.key}"`;
+    const k = ind.key;
+    if (ind?.att?.ignoreMiddle) {
+      return `"${k}-upper","${k}-lower","${k}-pb"`;
+    }
+
+    return `"${k}-middle","${k}-upper","${k}-lower","${k}-pb"`;
   }
 
   /**
@@ -155,11 +168,14 @@ class AtrFactory {
    * @return {(*|number)[]}
    */
   static getCsvContent(ind, bar) {
-    const p = ind.att.period ?? 14;
-    return [bar.atr[p]];
+    const k = ind.key;
+    const val = bar.indicators[k];
+    if (ind?.att?.ignoreMiddle) {
+      return [val.upper, val.lower, val.pb];
+    }
+
+    return [val.middle, val.upper, val.lower, val.pb];
   }
 }
 
-module.exports = AtrFactory;
-
-// todo :: use sma ATR instead
+module.exports = BBFactory;

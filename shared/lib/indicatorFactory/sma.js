@@ -1,12 +1,12 @@
-const IchimokuCloud = require("technicalindicators").IchimokuCloud;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const SMA = require("technicalindicators").SMA;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up IchimokuCloud values
+ * Functions that fill up SMA values
  */
-class ICFactory {
+class SmaFactory {
   /**
-   * Setup a factory that fill up IchimokuCloud values of certain dataSet
+   * Setup a factory that fill up SMA values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,10 +22,7 @@ class ICFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.conversionPeriod = att.conversionPeriod ?? 9;
-    this.basePeriod = att.basePeriod ?? 26;
-    this.spanPeriod = att.spanPeriod ?? 52;
-    this.displacement = att.displacement ?? this.basePeriod;
+    this.period = att.period ?? 14;
 
     this.initialized = false;
   }
@@ -38,14 +35,7 @@ class ICFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.ic = new IchimokuCloud({
-        conversionPeriod: this.conversionPeriod,
-        basePeriod: this.basePeriod,
-        spanPeriod: this.spanPeriod,
-        displacement: this.displacement,
-        high: [],
-        low: [],
-      });
+      this.sma = new SMA({ period: this.period, values: [] });
       return;
     }
 
@@ -54,8 +44,6 @@ class ICFactory {
       return;
     }
 
-    const barsProbablyRequired =
-      Math.max(this.conversionPeriod, this.basePeriod, this.spanPeriod) + 1;
     const pastProcessedCandleInPeriod = await Bar.find(
       {
         instrument: this.instrument,
@@ -65,20 +53,12 @@ class ICFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(barsProbablyRequired)
+      .limit(this.period)
       .lean();
 
-    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
-    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
+    const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.ic = new IchimokuCloud({
-      conversionPeriod: this.conversionPeriod,
-      basePeriod: this.basePeriod,
-      spanPeriod: this.spanPeriod,
-      displacement: this.displacement,
-      high,
-      low,
-    });
+    this.sma = new SMA({ period: this.period, values });
   }
 
   /**
@@ -98,7 +78,6 @@ class ICFactory {
       barQuery.datetime = { $gt: this.lastProcessedCandle };
     }
     const bars = await Bar.find(barQuery, {
-      open: 1,
       high: 1,
       low: 1,
       close: 1,
@@ -114,12 +93,7 @@ class ICFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.ic.nextValue({
-        open: bar.open,
-        high: bar.high,
-        low: bar.low,
-        close: bar.close,
-      });
+      const result = this.sma.nextValue(bar.close);
 
       const output = {
         updateOne: {
@@ -167,8 +141,7 @@ class ICFactory {
    * @return {string}
    */
   static getCsvHeaderString(ind) {
-    const k = ind.key;
-    return `"${k}-conversion","${k}-base","${k}-spanA","${k}-spanB"`;
+    return `"${ind.key}"`;
   }
 
   /**
@@ -178,11 +151,8 @@ class ICFactory {
    * @return {(*|number)[]}
    */
   static getCsvContent(ind, bar) {
-    const k = ind.key;
-    const val = bar.indicators[k];
-
-    return [val.conversion, val.base, val.spanA, val.spanB];
+    return [bar.indicators[ind.key]];
   }
 }
 
-module.exports = ICFactory;
+module.exports = SmaFactory;

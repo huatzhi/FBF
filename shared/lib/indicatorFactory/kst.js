@@ -1,12 +1,12 @@
-const SMA = require("technicalindicators").SMA;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const KST = require("technicalindicators").KST;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up SMA values
+ * Functions that fill up Know Sure Thing values
  */
-class SmaFactory {
+class KstFactory {
   /**
-   * Setup a factory that fill up SMA values of certain dataSet
+   * Setup a factory that fill up Know Sure Thing values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,7 +22,15 @@ class SmaFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.period = att.period ?? 14;
+    this.ROCPer1 = att.ROCPer1 ?? 10;
+    this.ROCPer2 = att.ROCPer2 ?? 15;
+    this.ROCPer3 = att.ROCPer3 ?? 20;
+    this.ROCPer4 = att.ROCPer4 ?? 30;
+    this.SMAROCPer1 = att.SMAROCPer1 ?? 10;
+    this.SMAROCPer2 = att.SMAROCPer2 ?? 10;
+    this.SMAROCPer3 = att.SMAROCPer3 ?? 10;
+    this.SMAROCPer4 = att.SMAROCPer4 ?? 15;
+    this.signalPeriod = att.signalPeriod ?? 9;
 
     this.initialized = false;
   }
@@ -35,7 +43,18 @@ class SmaFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.sma = new SMA({ period: this.period, values: [] });
+      this.kst = new KST({
+        values: [],
+        ROCPer1: this.ROCPer1,
+        ROCPer2: this.ROCPer2,
+        ROCPer3: this.ROCPer3,
+        ROCPer4: this.ROCPer4,
+        SMAROCPer1: this.SMAROCPer1,
+        SMAROCPer2: this.SMAROCPer2,
+        SMAROCPer3: this.SMAROCPer3,
+        SMAROCPer4: this.SMAROCPer4,
+        signalPeriod: this.signalPeriod,
+      });
       return;
     }
 
@@ -43,6 +62,8 @@ class SmaFactory {
       this.completed = true;
       return;
     }
+
+    const requiredBars = this.ROCPer4 + this.SMAROCPer4 + this.signalPeriod;
 
     const pastProcessedCandleInPeriod = await Bar.find(
       {
@@ -53,12 +74,23 @@ class SmaFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(this.period)
+      .limit(requiredBars)
       .lean();
 
     const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.sma = new SMA({ period: this.period, values });
+    this.kst = new KST({
+      values,
+      ROCPer1: this.ROCPer1,
+      ROCPer2: this.ROCPer2,
+      ROCPer3: this.ROCPer3,
+      ROCPer4: this.ROCPer4,
+      SMAROCPer1: this.SMAROCPer1,
+      SMAROCPer2: this.SMAROCPer2,
+      SMAROCPer3: this.SMAROCPer3,
+      SMAROCPer4: this.SMAROCPer4,
+      signalPeriod: this.signalPeriod,
+    });
   }
 
   /**
@@ -93,7 +125,7 @@ class SmaFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.sma.nextValue(bar.close);
+      const result = this.kst.nextValue(bar.close);
 
       const output = {
         updateOne: {
@@ -104,6 +136,9 @@ class SmaFactory {
 
       if (!result) {
         output.updateOne.update[updateKey] = null;
+      }
+
+      if (!result?.signal) {
         output.updateOne.update.disqualified = true;
       }
 
@@ -141,7 +176,8 @@ class SmaFactory {
    * @return {string}
    */
   static getCsvHeaderString(ind) {
-    return `"${ind.key}"`;
+    const k = ind.key;
+    return `"${k}-kst","${k}-signal"`;
   }
 
   /**
@@ -151,8 +187,11 @@ class SmaFactory {
    * @return {(*|number)[]}
    */
   static getCsvContent(ind, bar) {
-    return [bar.indicators[ind.key]];
+    const k = ind.key;
+    const val = bar.indicators[k];
+
+    return [val.kst, val.signal];
   }
 }
 
-module.exports = SmaFactory;
+module.exports = KstFactory;

@@ -1,12 +1,12 @@
-const AO = require("technicalindicators").AwesomeOscillator;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const EMA = require("technicalindicators").EMA;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up Awesome Oscillator values
+ * Functions that fill up EMA values
  */
-class AOFactory {
+class EmaFactory {
   /**
-   * Setup a factory that fill up Awesome Oscillator values of certain dataSet
+   * Setup a factory that fill up EMA values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,8 +22,7 @@ class AOFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.fastPeriod = att.fastPeriod ?? 5;
-    this.slowPeriod = att.slowPeriod ?? 34;
+    this.period = att.period ?? 14;
 
     this.initialized = false;
   }
@@ -36,12 +35,7 @@ class AOFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.ao = new AO({
-        fastPeriod: this.fastPeriod,
-        slowPeriod: this.slowPeriod,
-        high: [],
-        low: [],
-      });
+      this.ema = new EMA({ period: this.period, values: [] });
       return;
     }
 
@@ -59,18 +53,12 @@ class AOFactory {
       { high: 1, low: 1, close: 1 }
     )
       .sort({ datetime: -1 })
-      .limit(this.slowPeriod)
+      .limit(this.period)
       .lean();
 
-    const high = pastProcessedCandleInPeriod.map((b) => b.high).reverse();
-    const low = pastProcessedCandleInPeriod.map((b) => b.low).reverse();
+    const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.ao = new AO({
-      fastPeriod: this.fastPeriod,
-      slowPeriod: this.slowPeriod,
-      high,
-      low,
-    });
+    this.ema = new EMA({ period: this.period, values });
   }
 
   /**
@@ -105,11 +93,7 @@ class AOFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.ao.nextValue({
-        high: bar.high,
-        low: bar.low,
-        close: bar.close,
-      });
+      const result = this.ema.nextValue(bar.close);
 
       const output = {
         updateOne: {
@@ -171,4 +155,4 @@ class AOFactory {
   }
 }
 
-module.exports = AOFactory;
+module.exports = EmaFactory;

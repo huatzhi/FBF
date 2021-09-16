@@ -7,7 +7,7 @@ const {
   Result,
 } = require("../../shared/database/models/index");
 const p = require("path");
-const IndicatorFactory = require("../2/lib/indicatorFactory/index");
+const IndicatorFactory = require("../../shared/lib/indicatorFactory/index");
 
 /**
  * Export data into csv based on

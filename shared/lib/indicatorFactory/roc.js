@@ -1,12 +1,12 @@
-const BB = require("technicalindicators").BollingerBands;
-const { Bar, DataSet } = require("../../../../shared/database/models/index");
+const ROC = require("technicalindicators").ROC;
+const { Bar, DataSet } = require("../../database/models/index");
 
 /**
- * Functions that fill up Bollinger Bands values
+ * Functions that fill up Rate of Change values
  */
-class BBFactory {
+class RocFactory {
   /**
-   * Setup a factory that fill up Bollinger Bands values of certain dataSet
+   * Setup a factory that fill up Rate of Change values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
    * @param {object} att
@@ -22,9 +22,7 @@ class BBFactory {
     this.lastBar = dataSet.lastBar;
     this.key = key;
 
-    this.period = att.period ?? 14;
-    this.stdDev = att.stdDev ?? 2;
-    this.ignoreMiddle = att.ignoreMiddle ?? false;
+    this.period = att.period ?? 12;
 
     this.initialized = false;
   }
@@ -37,11 +35,7 @@ class BBFactory {
   async init() {
     this.initialized = true;
     if (!this.lastProcessedCandle) {
-      this.bb = new BB({
-        period: this.period,
-        stdDev: this.stdDev,
-        values: [],
-      });
+      this.roc = new ROC({ period: this.period, values: [] });
       return;
     }
 
@@ -64,7 +58,7 @@ class BBFactory {
 
     const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    this.bb = new BB({ period: this.period, stdDev: this.stdDev, values });
+    this.roc = new ROC({ period: this.period, values });
   }
 
   /**
@@ -99,13 +93,7 @@ class BBFactory {
     }
 
     const bulkWriteQueries = bars.map((bar) => {
-      const result = this.bb.nextValue(bar.close);
-
-      if (this.ignoreMiddle) {
-        if (result?.middle) {
-          delete result?.middle;
-        }
-      }
+      const result = this.roc.nextValue(bar.close);
 
       const output = {
         updateOne: {
@@ -153,12 +141,7 @@ class BBFactory {
    * @return {string}
    */
   static getCsvHeaderString(ind) {
-    const k = ind.key;
-    if (ind?.att?.ignoreMiddle) {
-      return `"${k}-upper","${k}-lower","${k}-pb"`;
-    }
-
-    return `"${k}-middle","${k}-upper","${k}-lower","${k}-pb"`;
+    return `"${ind.key}"`;
   }
 
   /**
@@ -168,14 +151,8 @@ class BBFactory {
    * @return {(*|number)[]}
    */
   static getCsvContent(ind, bar) {
-    const k = ind.key;
-    const val = bar.indicators[k];
-    if (ind?.att?.ignoreMiddle) {
-      return [val.upper, val.lower, val.pb];
-    }
-
-    return [val.middle, val.upper, val.lower, val.pb];
+    return [bar.indicators[ind.key]];
   }
 }
 
-module.exports = BBFactory;
+module.exports = RocFactory;
