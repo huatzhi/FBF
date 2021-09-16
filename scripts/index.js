@@ -4,8 +4,8 @@ const Scripts = {
   2.1: require("./2.1/addNewIndicator"),
   3: require("./3/fillResult"),
   3.1: require("./3.1/addNewResult"),
-  4: require("./4/exportToCsv"),
   4.1: require("./4.1/exportToCsv"),
+  4.2: require("./4.2/exportToCsv"),
 };
 
 module.exports = Scripts;
