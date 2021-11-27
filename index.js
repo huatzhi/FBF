@@ -1,3 +1,4 @@
+require('./shared/lib/preload');
 const prompt = require("prompt");
 const DB = require("./shared/database/loader");
 const Scripts = require("./scripts/index");

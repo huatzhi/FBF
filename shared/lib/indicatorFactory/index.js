@@ -4,6 +4,7 @@ const IndicatorFactory = {
   ao: require("./ao"),
   bb: require("./bb"),
   cci: require("./cci"),
+  chi: require("./chi"),
   kst: require("./kst"),
   macd: require("./macd"),
   roc: require("./roc"),
