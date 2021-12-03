@@ -1,7 +1,7 @@
 const options = {
   instrumentsLimit: [],
   timeFrameLimit: [],
-  indicatorKeyLimit: [],
+  indicatorKeyLimit: ["CHI(10,5,1)"],
   indicatorTypeLimit: ["custom"],
 };
 

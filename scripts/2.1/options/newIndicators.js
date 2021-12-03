@@ -1053,6 +1053,17 @@ const newIndicators = [
     name: "tweezerbottom",
     att: {},
   },
+  // CHI (Choppy Index)
+  {
+    key: "CHI(10,5,1)",
+    type: IndicatorTypes.CUSTOM,
+    name: "chi",
+    att: {
+      period: 10,
+      subPeriod: 5,
+      tolerance: 1,
+    },
+  },
 ];
 
 module.exports = newIndicators;

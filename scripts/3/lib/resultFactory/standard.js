@@ -1,6 +1,6 @@
 const { evaluate } = require("mathjs");
 const { Result } = require("../../../../shared/const/result");
-const { Bar, DataSet } = require("../../database/models/index");
+const { Bar, DataSet } = require("../../../../shared/database/models");
 
 /**
  * Function that fill up standard result

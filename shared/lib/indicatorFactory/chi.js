@@ -1,19 +1,19 @@
 /** CHOP INDEX (custom) */
 const { Bar, DataSet } = require("../../database/models/index");
-require('../preload/index');
+require("../preload/index");
 
 /**
  * Functions that fill up Chop Index values.
- * 
- * Chop index is a custom indicator that try to determine how choppy 
- * is the market at the moment. It use candle direction of the past 
+ *
+ * Chop index is a custom indicator that try to determine how choppy
+ * is the market at the moment. It use candle direction of the past
  * data to determine that.
- * 
- * Value output is 0-100, the lower tha value, the more choppy the 
- * market. Generally is adviced to not trade in choppy market. 
+ *
+ * Value output is 0-100, the lower tha value, the more choppy the
+ * market. Generally is adviced to not trade in choppy market.
  */
 class ChiFactory {
-    /**
+  /**
    * Setup a factory that fill up CHI values of certain dataSet
    * @param {object} dataSet
    * @param {string} key
@@ -31,20 +31,20 @@ class ChiFactory {
     this.key = key;
 
     /** @type {Number}
-     * 
+     *
      * How far the choppyness is detemined */
     this.period = att.period ?? 10;
 
     /** @type {Number}
-     * 
+     *
      * Each candle of chopyness how far is used */
     this.subPeriod = att.subPeriod ?? 5;
 
     /** @type {Number}
-     * 
+     *
      * Acceptable choppy value, how less choppy it should within
      * subPeriod to determine it is not chop.
-     * 
+     *
      * Acceptable range from 0-(subPeriod/2) */
     this.tolerant = att.tolerant ?? 1;
 
@@ -90,54 +90,54 @@ class ChiFactory {
 
     const values = pastProcessedCandleInPeriod.map((b) => b.close).reverse();
 
-    values.forEach(({open, close}) => {
-      calc(open, close);
+    values.forEach(({ open, close }) => {
+      this.calc(open, close);
     });
   }
 
   /**
    * Calculate choppy index (0-100)
-   * 
+   *
    * @private
-   * @param open {Number}
-   * @param close {Number}
+   * @param {Number} open
+   * @param {Number} close
    * @return {Number|null}
    */
   calc(open, close) {
     const isNewSubPeriodSmooth = this.isNewSubPeriodSmooth(open, close);
-    if (isNewSubPeriodSmooth === null){
+    if (isNewSubPeriodSmooth === null) {
       return null;
     }
 
     this.isSubPeriodChoppyStack.push(isNewSubPeriodSmooth);
 
-    if (this.isSubPeriodChoppyStack < this.period) {
+    if (this.isSubPeriodChoppyStack.length < this.period) {
       return null;
     }
 
-    if (this.isSubPeriodChoppyStack > this.period) {
+    if (this.isSubPeriodChoppyStack.length > this.period) {
       this.isSubPeriodChoppyStack.shift();
     }
 
     const smoothCount = this.isSubPeriodChoppyStack.count(true);
-    const smoothIndex = Math.floor(smoothCount/this.period*100);
+    const smoothIndex = Math.floor((smoothCount / this.period) * 100);
 
     return smoothIndex;
   }
 
   /**
    * Given the new value, check if new subperiod consider smooth
-   * 
+   *
    * @private
-   * @param {Number} open 
-   * @param {Number} close 
+   * @param {Number} open
+   * @param {Number} close
    * @return {Boolean|null}
    */
   isNewSubPeriodSmooth(open, close) {
     if (open === close) {
-      this.pastBarColorStack.push('w')
+      this.pastBarColorStack.push("w");
     } else {
-      const color = open > close ? 'r' : 'g';
+      const color = open > close ? "r" : "g";
       this.pastBarColorStack.push(color);
     }
 
@@ -149,10 +149,12 @@ class ChiFactory {
       this.pastBarColorStack.shift();
     }
 
-    const rCount = this.pastBarColorStack.count('r');
-    const gCount = this.pastBarColorStack.count('g');
+    const rCount = this.pastBarColorStack.count("r");
+    const gCount = this.pastBarColorStack.count("g");
 
-    return Boolean(rCount >= this.smoothThresholdCount || gCount >= this.smoothThresholdCount);
+    return Boolean(
+      rCount >= this.smoothThresholdCount || gCount >= this.smoothThresholdCount
+    );
   }
 
   /**
@@ -250,3 +252,5 @@ class ChiFactory {
     return [val];
   }
 }
+
+module.exports = ChiFactory;

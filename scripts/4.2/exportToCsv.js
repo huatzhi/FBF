@@ -45,7 +45,10 @@ async function exportToCsv() {
     .join();
   const dtHeader = options.includeDateTime ? "datetime," : "";
   const candleHeaders = dtHeader + "O,H,L,C"; // backlog :: add date time category too later
-  const resultHeaders = "RESULT(LONG),RESULT(SHORT),RESULT(NONE)";
+  const TPSLHeaders = options?.includesTPSL
+    ? "TP_LONG,SL_LONG,TP_SHORT,SL_SHORT,"
+    : "";
+  const resultHeaders = `${TPSLHeaders}RESULT(LONG),RESULT(SHORT),RESULT(NONE)`;
   const csvHeader = `${candleHeaders},${indicatorHeaders},${resultHeaders}`;
 
   const totalTasks = dataSets.length;
@@ -70,12 +73,14 @@ async function writeCsvFile(dataSet, indicators, csvHeader, resultObj) {
   const outputPath = p.resolve(__dirname, "./csv-output");
 
   const now = new Date();
-  const outputFileName = `${now.getFullYear()}.${(
-    "0" +
-    (now.getMonth() + 1)
-  ).slice(-2)}.${("0" + (now.getDate() + 1)).slice(-2)}-${dataSet.instrument}-${
-    dataSet.timeFrame
-  }-${resultObj.key}.csv`;
+  const outputFileName = options.completeFileName
+    ? `${now.getFullYear()}.${("0" + (now.getMonth() + 1)).slice(-2)}.${(
+        "0" +
+        (now.getDate() + 1)
+      ).slice(-2)}-${dataSet.instrument}-${dataSet.timeFrame}-${
+        resultObj.key
+      }.csv`
+    : `${dataSet.instrument}.csv`;
 
   const writer = fs.createWriteStream(`${outputPath}/${outputFileName}`, {
     flags: "w",
@@ -88,7 +93,7 @@ async function writeCsvFile(dataSet, indicators, csvHeader, resultObj) {
 
   for (;;) {
     const barFindQuery = {
-      disqualified: false,
+      disqualified: options?.includeDisqualified ?? false,
       instrument: dataSet.instrument,
       timeFrame: dataSet.timeFrame,
     };
@@ -115,8 +120,12 @@ async function writeCsvFile(dataSet, indicators, csvHeader, resultObj) {
           return vals.join();
         })
         .join();
-      const result = b.result[resultObj.key].result.join();
-      return `${cValues},${values},${result}\n`;
+      const resultValueObj = b.result[resultObj.key];
+      const TPSL = options?.includesTPSL
+        ? `${resultValueObj.TP_LONG},${resultValueObj.SL_LONG},${resultValueObj.TP_SHORT},${resultValueObj.SL_SHORT},`
+        : "";
+      const result = resultValueObj.result.join();
+      return `${cValues},${values},${TPSL}${result}\n`;
     });
     writer.write(writeStrArr.join(""));
 

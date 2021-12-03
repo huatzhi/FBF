@@ -159,7 +159,7 @@ class AdxFactory {
    */
   static getCsvContent(ind, bar) {
     const k = ind.key;
-    const val = bar.indicators[k];
+    const val = bar.indicators[k] ?? {};
 
     return [val.adx, val.pdi, val.mdi];
   }

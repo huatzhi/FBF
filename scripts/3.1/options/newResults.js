@@ -52,6 +52,28 @@ const newResults = [
       tradeLength: 15,
     },
   },
+
+  {
+    key: "Basic(14,1_5,2_25,20)",
+    type: ResultTypes.STANDARD,
+    att: {
+      atrPeriod: 14,
+      sl: 1.5,
+      tp: 2.25,
+      tradeLength: 20,
+    },
+  },
+
+  {
+    key: "Basic(14,3,4_5,50)",
+    type: ResultTypes.STANDARD,
+    att: {
+      atrPeriod: 14,
+      sl: 3,
+      tp: 4.5,
+      tradeLength: 50,
+    },
+  },
 ];
 
 module.exports = newResults;
